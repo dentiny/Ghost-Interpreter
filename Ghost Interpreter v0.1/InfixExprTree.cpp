@@ -5,7 +5,7 @@
 #include <functional>
 #include <unordered_map>
 
-class ExprTree
+class InfixExprTree
 {
 private:
     class Node
@@ -51,10 +51,10 @@ private:
         {"/", [](int num1, int num2) { return num1 / num2; }}
     };
 
-    
-
+    // root node of the expression tree
     Node * root;
 
+    // find the first match right parenthesis
     int findMatched(std::vector<std::string> & expression, int i)
     {
         int N = expression.size();
@@ -82,6 +82,7 @@ private:
         return j;
     }
 
+    // character-wise parse expression
     Node * buildTreeHelper(std::vector<std::string> & expression, bool inBrace=false)
     {
         Node * r = nullptr;
@@ -143,10 +144,6 @@ private:
             else if(ops.find(token) != ops.end())
             {
                 Node * p = new Node(token);
-
-                std::cout << "node to append is " << token << std::endl;
-                if(r != nullptr) std::cout << "root is " << r->val << " with priority " << r->getPriority() << std::endl;
-
                 if(r == nullptr)
                 {
                     r = p;
@@ -155,30 +152,150 @@ private:
                 }
                 else if(p->getPriority() <= r->getPriority())
                 {
-                    Node * temp = r;
+                    p->left = r;
                     r = p;
-                    p->left = temp;
+                    cur = nullptr;
                 }
                 else if(p->getPriority() > r->getPriority())
                 {
-                    if(cur == nullptr)
-                    {
-                        p->left = r->right;
-                        r->right = p;
-                        cur = p;
-                    }
-                    else if(cur != nullptr)
-                    {
-                        p->left = cur->right;
-                        cur->right = p;
-                        cur = p;
-                    }
+                    p->left = r->right;
+                    r->right = p;
+                    cur = p;
                 }
                 else
                 {
                     std::cout << "Operator error" << std::endl;
                 }
             }
+
+/*
+            debug information
+            std::cout << "current node is " << token << std::endl;
+            if(r)
+            {
+                std::cout << "root is " << r->val << std::endl;
+                if(r->left)
+                {
+                    std::cout << "left node is " << r->left->val << std::endl;
+                    if(r->left->left)
+                    {
+                        std::cout << "left left node is " << r->left->left->val << std::endl;
+                        if(r->left->left->left) 
+                        {
+                            std::cout << "left left left node is " << r->left->left->left->val << std::endl;
+                            if(r->left->left->left->left)
+                            {
+                                std::cout << "left left left left node is " << r->left->left->left->left->val << std::endl;
+                            }
+                            if(r->left->left->left->right)
+                            {
+                                std::cout << "left left left right node is " << r->left->left->left->right->val << std::endl;
+                            }
+                        }
+                        if(r->left->left->right)
+                        {
+                            std::cout << "left left right node is " << r->left->left->right->val << std::endl;
+                            if(r->left->left->right->left)
+                            {
+                                std::cout << "left left right left node is " << r->left->left->right->left->val << std::endl;
+                            }
+                            if(r->left->left->right->right)
+                            {
+                                std::cout << "left left right right node is " << r->left->left->right->right->val << std::endl;
+                            }
+                        }
+                    }
+                    if(r->left->right)
+                    {
+                        std::cout << "left right node is " << r->left->right->val << std::endl;
+                        if(r->left->right->left) 
+                        {
+                            std::cout << "left right left node is " << r->left->right->left->val << std::endl;
+                            if(r->left->right->left->left)
+                            {
+                                std::cout << "left right left left node is " << r->left->right->left->left->val << std::endl;
+                            }
+                            if(r->left->right->left->right)
+                            {
+                                std::cout << "left right left right node is " << r->left->right->left->right->val << std::endl;
+                            }
+                        }
+                        if(r->left->right->right)
+                        {
+                            std::cout << "left right right node is " << r->left->right->right->val << std::endl;
+                            if(r->left->right->right->left)
+                            {
+                                std::cout << "left right right left node is " << r->left->right->right->left->val << std::endl;
+                            }
+                            if(r->left->right->right->right)
+                            {
+                                std::cout << "left right right right node is " << r->left->right->right->right->val << std::endl;
+                            }
+                        }
+                    }
+                }
+                if(r->right)
+                {
+                    std::cout << "right node is " << r->right->val << std::endl;
+                    if(r->right->left)
+                    {
+                        std::cout << "right left node is " << r->right->left->val << std::endl;
+                        if(r->right->left->left) 
+                        {
+                            std::cout << "right left left node is " << r->right->left->left->val << std::endl;
+                            if(r->right->left->left->left)
+                            {
+                                std::cout << "right left left left node is " << r->right->left->left->left->val << std::endl;
+                            }
+                            if(r->right->left->left->right)
+                            {
+                                std::cout << "right left left right node is " << r->right->left->left->right->val << std::endl;
+                            }
+                        }
+                        if(r->right->left->right)
+                        {
+                            std::cout << "right left right node is " << r->right->left->right->val << std::endl;
+                            if(r->right->left->right->left)
+                            {
+                                std::cout << "right left right left node is " << r->right->left->right->left->val << std::endl;
+                            }
+                            if(r->right->left->right->right)
+                            {
+                                std::cout << "right left right right node is " << r->right->left->right->right->val << std::endl;
+                            }
+                        }
+                    }
+                    if(r->right->right)
+                    {
+                        std::cout << "right right node is " << r->right->right->val << std::endl;
+                        if(r->right->right->left) 
+                        {
+                            std::cout << "right right left node is " << r->right->right->left->val << std::endl;
+                            if(r->right->right->left->left)
+                            {
+                                std::cout << "right right left left node is " << r->right->right->left->left->val << std::endl;
+                            }
+                            if(r->right->right->left->right)
+                            {
+                                std::cout << "right right left right node is " << r->right->right->left->right->val << std::endl;
+                            }
+                        }
+                        if(r->right->right->right)
+                        {
+                            std::cout << "right right right node is " << r->right->right->right->val << std::endl;
+                            if(r->right->right->right->left)
+                            {
+                                std::cout << "right right right left node is " << r->right->right->right->left->val << std::endl;
+                            }
+                            if(r->right->right->right->right)
+                            {
+                                std::cout << "right right right right node is " << r->right->right->right->right->val << std::endl;
+                            }
+                        }
+                    }
+                }
+            }
+*/
         }
 
         if(inBrace)
@@ -188,16 +305,8 @@ private:
         return r;
     }
 
-    void inorderHelper(Node * r)
-    {
-        if(r != nullptr)
-        {
-            inorderHelper(r->left);
-            std::cout << r->val << " " << std::flush;
-            inorderHelper(r->right);
-        }
-    }
-
+    // helper function for eval()
+    // recursively eval the node
     int evalHelper(Node * r)
     {
         if(r->left != nullptr && r->right != nullptr)
@@ -209,6 +318,8 @@ private:
         return stol(r->val);
     }
 
+    // helper function for delete()
+    // recursively de-allocate allocated memory
     void deleteHelper(Node * r)
     {
         if(r != nullptr)
@@ -220,24 +331,22 @@ private:
     }
 
 public:
+    // constructor
     ExprTree() : root{nullptr} {}    
 
+    // build the expression tree
     void buildTree(std::vector<std::string> & expression)
     {
         root = buildTreeHelper(expression);
     }
 
-    void inorder()
-    {
-        inorderHelper(root);
-    }
-
+    // evaluate the expression
     int eval()
     {
-        std::cout << "root is " << root->val << std::endl;
         return evalHelper(root);
     }
 
+    // destructor
     ~ExprTree()
     {
         deleteHelper(root);
@@ -246,10 +355,13 @@ public:
 
 int main(void)
 {
+    //1+2+555*(8/4+5)/3*(6-2)
     std::vector<std::string> expression1{"(", "1", "+", "2", ")", "*", "(", "3", "+", "2", ")", "+", "2", "+", "5", "+", "(", "5", "+", "7", ")"};
     std::vector<std::string> expression2{"1", "+", "2"};
+    std::vector<std::string> expression3{"3", "*", "2", "+", "5", "/", "2", "*", "(", "4", "-", "1", ")", "-", "1", "*", "3"};
+    std::vector<std::string> expression4{"1", "+", "2", "+", "555", "*", "(", "8", "/", "4", "+", "5", ")", "/", "3", "*", "(", "6", "-", "2", ")"};
     ExprTree exprTree = ExprTree();
-    exprTree.buildTree(expression1);
+    exprTree.buildTree(expression4);
 //    exprTree.inorder();
     std::cout << exprTree.eval() << std::endl;
 }
