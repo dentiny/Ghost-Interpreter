@@ -31,7 +31,7 @@ private:
     }
 
 public:
-    bool compare(std::vector<std::string> & cmd_vec)
+    bool compare(const std::vector<std::string> & cmd_vec)
     {
         std::string op = cmd_vec[1];
         std::string val1 = cmd_vec[0];

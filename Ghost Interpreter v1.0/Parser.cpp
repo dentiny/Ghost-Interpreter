@@ -10,8 +10,32 @@
 #include <iostream>
 
 // helper function for singleTokenHandle()
+// enter into and leave from scope
+bool Parser::singleScopeHandle(const std::vector<std::string> & cmd_vec)
+{
+    std::string op = cmd_vec[0];
+    if(op == "{")
+    {
+        ++scopeDepth;
+        createScopeManager();
+        return true;
+    }
+    else if(op == "}")
+    {
+        // make sure scope is valid
+        if(scopeDepth >= 1)
+        {
+            --scopeDepth;
+            deleteScopeManager();
+            return true;
+        }
+    }
+    return false;
+}
+
+// helper function for singleTokenHandle()
 // variable value check: x => 20
-bool Parser::singleVarHandle(std::vector<std::string> & cmd_vec)
+bool Parser::singleVarHandle(const std::vector<std::string> & cmd_vec)
 {
     std::string var_name = cmd_vec[0];
     if(hasVariable(var_name))
@@ -25,7 +49,7 @@ bool Parser::singleVarHandle(std::vector<std::string> & cmd_vec)
 
 // helper function for singleTokenHandle()
 // constant value check: x => 20
-bool Parser::singleConstHandle(std::vector<std::string> & cmd_vec)
+bool Parser::singleConstHandle(const std::vector<std::string> & cmd_vec)
 {
     std::string var_name = cmd_vec[0];
     varType typeRes = getVarType(var_name);
@@ -63,8 +87,9 @@ bool Parser::singleConstHandle(std::vector<std::string> & cmd_vec)
 
 // helper function for singleTokenHandle()
 // single function check: <function f at location>
-bool Parser::singleFuncHandle(std::vector<std::string> & cmd_vec)
+bool Parser::singleFuncHandle(const std::vector<std::string> & cmd_vec)
 {
+    err_no = INVALID_INPUT;
     std::string func_name = cmd_vec[0];
     if(hasBuiltinFuncVar(func_name) || hasFuncVariable(func_name))
     {
@@ -78,9 +103,9 @@ bool Parser::singleFuncHandle(std::vector<std::string> & cmd_vec)
 // (1) variable value check: x => 20 => singleVarHandle()
 // (2) constant value check: "Hao Jiang" => "Hao Jiang" => singleConstHandle()
 // (3) single function check: <function f at location> => singleFuncHandle()
-bool Parser::singleTokenHandle(std::vector<std::string> & cmd_vec)
+bool Parser::singleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
-    if(singleVarHandle(cmd_vec) || singleConstHandle(cmd_vec) || singleFuncHandle(cmd_vec))
+    if(singleScopeHandle(cmd_vec) || singleVarHandle(cmd_vec) || singleConstHandle(cmd_vec) || singleFuncHandle(cmd_vec))
     {
         return true;
     }
@@ -90,7 +115,7 @@ bool Parser::singleTokenHandle(std::vector<std::string> & cmd_vec)
 
 // helper function for doubleTokenHandle()
 // self-operation: ++x
-bool Parser::doubleSelfOperation(std::vector<std::string> & cmd_vec)
+bool Parser::doubleSelfOperation(const std::vector<std::string> & cmd_vec)
 {
     std::string op1 = cmd_vec[0];
     std::string op2 = cmd_vec[1];
@@ -139,14 +164,12 @@ bool Parser::doubleSelfOperation(std::vector<std::string> & cmd_vec)
             return false;
         }
     }
-    
-    err_no = INVALID_INPUT;
     return false;
 }
 
 // helper function for doubleTokenHandle()
 // string concatenation: "aaa""bbb" => "aaabbb"
-bool Parser::doubleConcatOperation(std::vector<std::string> & cmd_vec)
+bool Parser::doubleConcatOperation(const std::vector<std::string> & cmd_vec)
 {
     std::string op1 = cmd_vec[0];
     std::string op2 = cmd_vec[1];
@@ -157,16 +180,15 @@ bool Parser::doubleConcatOperation(std::vector<std::string> & cmd_vec)
         std::cout << catRes << std::endl;
         return true;
     }
-
-    err_no = INVALID_INPUT;
     return false;
 }
 
 // handle two token command
 // (1) self-increment and self-decrement: x++ => doubleSelfOperation()
 // (2) string concatenation: "aaa""bbb" => "aaabbb"
-bool Parser::doubleTokenHandle(std::vector<std::string> & cmd_vec)
+bool Parser::doubleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
+    err_no = INVALID_INPUT;
     if(doubleSelfOperation(cmd_vec) || doubleConcatOperation(cmd_vec))
     {
         return true;
@@ -176,7 +198,7 @@ bool Parser::doubleTokenHandle(std::vector<std::string> & cmd_vec)
 
 // helper function for tripleTokenHandle()
 // built-in function with no argument
-bool Parser::tripleTokenBuiltin(std::vector<std::string> & cmd_vec)
+bool Parser::tripleTokenBuiltin(const std::vector<std::string> & cmd_vec)
 {
     std::string f = cmd_vec[0];
 
@@ -193,14 +215,13 @@ bool Parser::tripleTokenBuiltin(std::vector<std::string> & cmd_vec)
         }
         return true;
     }
-
     err_no = INVALID_INPUT;
     return false;
 }
 
 // helper function for tripleTokenHandle()
 // update variable value
-bool Parser::tripleTokenUpdateVar(std::vector<std::string> & cmd_vec)
+bool Parser::tripleTokenUpdateVar(const std::vector<std::string> & cmd_vec)
 {
     // get corresponding parts of the expression
     std::string var_name = cmd_vec[0];
@@ -210,7 +231,6 @@ bool Parser::tripleTokenUpdateVar(std::vector<std::string> & cmd_vec)
     // check if assignment expression
     if(eq_sgn != "=")
     {
-        err_no = INVALID_INPUT;
         return false;
     }
 
@@ -228,15 +248,13 @@ bool Parser::tripleTokenUpdateVar(std::vector<std::string> & cmd_vec)
 
 // helper function for tripleTokenHandle()
 // compare between type objects and constant values
-bool Parser::tripleTokenCompareVar(std::vector<std::string> & cmd_vec)
+bool Parser::tripleTokenCompareVar(const std::vector<std::string> & cmd_vec)
 {
     bool cmpRes = compare(cmd_vec);
     if(cmpRes)
     {
         return true;
     }
-    
-    err_no = INVALID_INPUT;
     return false;
 }
 
@@ -244,8 +262,9 @@ bool Parser::tripleTokenCompareVar(std::vector<std::string> & cmd_vec)
 // (1) handle triple token for built-in function => tripleTokenBuiltin()
 // (2) handle triple token for update variable value => tripleTokenUpdateVar()
 // (3) handle triple token for comparison => tripleTokenCompareVar()
-bool Parser::tripleTokenHandle(std::vector<std::string> & cmd_vec)
+bool Parser::tripleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
+    err_no = INVALID_INPUT;
     if(tripleTokenUpdateVar(cmd_vec) || tripleTokenBuiltin(cmd_vec) || tripleTokenCompareVar(cmd_vec))
     {
         return true;
@@ -255,12 +274,11 @@ bool Parser::tripleTokenHandle(std::vector<std::string> & cmd_vec)
 
 // helper function for quadrupleTokenHandle()
 // handle quadruple token for variable declaration
-bool Parser::quadrupleVarDeclare(std::vector<std::string> & cmd_vec)
+bool Parser::quadrupleVarDeclare(const std::vector<std::string> & cmd_vec)
 {
     // decide whether variable declaration
     if(cmd_vec[0] != "var" || cmd_vec[2] != "=")
     {
-        err_no = INVALID_INPUT; // Invalid command line input
         return false;
     }
 
@@ -311,7 +329,7 @@ bool Parser::quadrupleVarDeclare(std::vector<std::string> & cmd_vec)
 
 // helper function for quadrupleTokenHandle()
 // handle quadruple token for built-in function with parameter
-bool Parser::quadrupleTokenBuiltin(std::vector<std::string> & cmd_vec)
+bool Parser::quadrupleTokenBuiltin(const std::vector<std::string> & cmd_vec)
 {
     std::string f = cmd_vec[0];
     std::string var_name = cmd_vec[2];
@@ -327,7 +345,6 @@ bool Parser::quadrupleTokenBuiltin(std::vector<std::string> & cmd_vec)
         std::cout << type_name << std::endl;
         return true;
     }
-
     else if(f == "val")
     {
         std::string val = getVal(var_name);
@@ -339,7 +356,6 @@ bool Parser::quadrupleTokenBuiltin(std::vector<std::string> & cmd_vec)
         std::cout << val << std::endl;
         return true;
     }
-
     else if(f == "query")
     {
         std::string ret = queryVar(var_name);
@@ -351,16 +367,15 @@ bool Parser::quadrupleTokenBuiltin(std::vector<std::string> & cmd_vec)
         std::cout << ret << std::endl;
         return true;
     }
-
-    err_no = INVALID_FUNC;
     return false;
 }
 
 // handle four token command
 // (1) handle quadruple token for built-in function with parameter => quadrupleTokenBuiltin()
 // (2) handle quadruple token for variable declaration => quadrupleVarDeclare()
-bool Parser::quadrupleTokenHandle(std::vector<std::string> & cmd_vec)
+bool Parser::quadrupleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
+    err_no = INVALID_INPUT;
     if(quadrupleTokenBuiltin(cmd_vec) || quadrupleVarDeclare(cmd_vec))
     {
         return true;

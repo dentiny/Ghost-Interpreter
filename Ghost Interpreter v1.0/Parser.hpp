@@ -18,20 +18,22 @@
 class Parser : virtual public DataManager, public Comparator
 {
 private:
-    bool singleVarHandle(std::vector<std::string> & cmd_vec); // handle single variable
-    bool singleConstHandle(std::vector<std::string> & cmd_vec); // handle single constant
-    bool singleFuncHandle(std::vector<std::string> & cmd_vec); // handle single function
-    bool singleTokenHandle(std::vector<std::string> & cmd_vec); // handle single token
-    bool doubleSelfOperation(std::vector<std::string> & cmd_vec); // handle double token for self-operation
-    bool doubleConcatOperation(std::vector<std::string> & cmd_vec); // handle double token for string concatenation
-    bool doubleTokenHandle(std::vector<std::string> & cmd_vec); // handle double token
-    bool tripleTokenBuiltin(std::vector<std::string> & cmd_vec); // handle triple token for built-in function
-    bool tripleTokenUpdateVar(std::vector<std::string> & cmd_vec); // handle triple token for update variable value
-    bool tripleTokenCompareVar(std::vector<std::string> & cmd_vec); // handle triple token for comparison
-    bool tripleTokenHandle(std::vector<std::string> & cmd_vec); // handle triple token
-    bool quadrupleVarDeclare(std::vector<std::string> & cmd_vec); // handle quadruple token for variable declaration
-    bool quadrupleTokenBuiltin(std::vector<std::string> & cmd_vec); // handle quadruple token for built-in function with parameter
-    bool quadrupleTokenHandle(std::vector<std::string> & cmd_vec); // handle quadruple token
+    unsigned scopeDepth = 0;
+    bool singleScopeHandle(const std::vector<std::string> & cmd_vec); // handle enter and leave scope
+    bool singleVarHandle(const std::vector<std::string> & cmd_vec); // handle single variable
+    bool singleConstHandle(const std::vector<std::string> & cmd_vec); // handle single constant
+    bool singleFuncHandle(const std::vector<std::string> & cmd_vec); // handle single function
+    bool singleTokenHandle(const std::vector<std::string> & cmd_vec); // handle single token
+    bool doubleSelfOperation(const std::vector<std::string> & cmd_vec); // handle double token for self-operation
+    bool doubleConcatOperation(const std::vector<std::string> & cmd_vec); // handle double token for string concatenation
+    bool doubleTokenHandle(const std::vector<std::string> & cmd_vec); // handle double token
+    bool tripleTokenBuiltin(const std::vector<std::string> & cmd_vec); // handle triple token for built-in function
+    bool tripleTokenUpdateVar(const std::vector<std::string> & cmd_vec); // handle triple token for update variable value
+    bool tripleTokenCompareVar(const std::vector<std::string> & cmd_vec); // handle triple token for comparison
+    bool tripleTokenHandle(const std::vector<std::string> & cmd_vec); // handle triple token
+    bool quadrupleVarDeclare(const std::vector<std::string> & cmd_vec); // handle quadruple token for variable declaration
+    bool quadrupleTokenBuiltin(const std::vector<std::string> & cmd_vec); // handle quadruple token for built-in function with parameter
+    bool quadrupleTokenHandle(const std::vector<std::string> & cmd_vec); // handle quadruple token
 
 public:
     bool parse(std::vector<std::string> & cmd_vec)
