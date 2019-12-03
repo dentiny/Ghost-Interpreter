@@ -1,6 +1,7 @@
 #include "Parser.hpp"
 #include "BasicDataManager.hpp"
 #include "DataManager.hpp"
+#include "ExprTree.hpp"
 #include "Ghost_intObj.hpp"
 #include "Ghost_floatObj.hpp"
 #include "Ghost_stringObj.hpp"
@@ -8,12 +9,12 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 // helper function for singleTokenHandle()
 // enter into and leave from scope
-bool Parser::singleScopeHandle(const std::vector<std::string> & cmd_vec)
+bool Parser::singleScopeHandle(const std::string & op)
 {
-    std::string op = cmd_vec[0];
     if(op == "{")
     {
         ++scopeDepth;
@@ -35,13 +36,20 @@ bool Parser::singleScopeHandle(const std::vector<std::string> & cmd_vec)
 
 // helper function for singleTokenHandle()
 // variable value check: x => 20
-bool Parser::singleVarHandle(const std::vector<std::string> & cmd_vec)
+bool Parser::singleVarHandle(const std::string & var_name, bool trailMode)
 {
-    std::string var_name = cmd_vec[0];
     if(hasVariable(var_name))
     {
         std::string val = getVariable(var_name);
-        std::cout << val << std::endl;
+        std::cout << val << std::flush;
+        if(trailMode)
+        {
+            std::cout << " " << std::flush;
+        }
+        else 
+        {
+            std::cout << std::endl;
+        }
         return true;
     }
     return false;
@@ -49,9 +57,8 @@ bool Parser::singleVarHandle(const std::vector<std::string> & cmd_vec)
 
 // helper function for singleTokenHandle()
 // constant value check: x => 20
-bool Parser::singleConstHandle(const std::vector<std::string> & cmd_vec)
+bool Parser::singleConstHandle(const std::string & var_name, bool trailMode)
 {
-    std::string var_name = cmd_vec[0];
     varType typeRes = getVarType(var_name);
     if(typeRes == varType::NULL_VAR)
     {
@@ -61,39 +68,81 @@ bool Parser::singleConstHandle(const std::vector<std::string> & cmd_vec)
     else if(typeRes == varType::INT_VAR)
     {
         Ghost_intObj obj(var_name);
-        std::cout << obj << std::endl;
+        std::cout << obj << std::flush;
+        if(trailMode)
+        {
+            std::cout << " " << std::flush;
+        }
+        else 
+        {
+            std::cout << std::endl;
+        }
         return true;
     }
     else if(typeRes == varType::FLOAT_VAR)
     {
         Ghost_floatObj obj(var_name);
-        std::cout << obj << std::endl;
+        std::cout << obj << std::flush;
+        if(trailMode)
+        {
+            std::cout << " " << std::flush;
+        }
+        else 
+        {
+            std::cout << std::endl;
+        }
         return true;
     }
     else if(typeRes == varType::STRING_VAR)
     {
         Ghost_stringObj obj(var_name);
-        std::cout << obj << std::endl;
+        std::cout << obj << std::flush;
+        if(trailMode)
+        {
+            std::cout << " " << std::flush;
+        }
+        else 
+        {
+            std::cout << std::endl;
+        }
         return true;
     }
     else if(typeRes == varType::LIST_VAR)
     {
         Ghost_listObj obj(var_name);
-        std::cout << obj << std::endl;
+        std::cout << obj << std::flush;
+        if(trailMode)
+        {
+            std::cout << " " << std::flush;
+        }
+        else 
+        {
+            std::cout << std::endl;
+        }
         return true;
     }
     return false;
 }
 
+// single variable, constant and function output method has been added a boolean argument -- trailMode
+// this argument is for the compatibility with built-in function -- printVarHandle()
+// for single string input, trailMode should be set false, which may generate a newliner after every var output
+// for continuous printint method, trailMode will be set on, thus space will act as splitter between strings
 // helper function for singleTokenHandle()
 // single function check: <function f at location>
-bool Parser::singleFuncHandle(const std::vector<std::string> & cmd_vec)
+bool Parser::singleFuncHandle(const std::string & func_name, bool trailMode)
 {
-    err_no = INVALID_INPUT;
-    std::string func_name = cmd_vec[0];
     if(hasBuiltinFuncVar(func_name) || hasFuncVariable(func_name))
     {
-        std::cout << "<Function object>" << std::endl;
+        std::cout << "<Function object>" << std::flush;
+        if(trailMode)
+        {
+            std::cout << " " << std::flush;
+        }
+        else 
+        {
+            std::cout << std::endl;
+        }
         return true;
     }
     return false;
@@ -105,7 +154,8 @@ bool Parser::singleFuncHandle(const std::vector<std::string> & cmd_vec)
 // (3) single function check: <function f at location> => singleFuncHandle()
 bool Parser::singleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
-    if(singleScopeHandle(cmd_vec) || singleVarHandle(cmd_vec) || singleConstHandle(cmd_vec) || singleFuncHandle(cmd_vec))
+    std::string token = cmd_vec[0];
+    if(singleScopeHandle(token) || singleVarHandle(token, false) || singleConstHandle(token, false) || singleFuncHandle(token, false))
     {
         return true;
     }
@@ -334,7 +384,12 @@ bool Parser::quadrupleTokenBuiltin(const std::vector<std::string> & cmd_vec)
     std::string f = cmd_vec[0];
     std::string var_name = cmd_vec[2];
 
-    if(f == "type")
+    if(f == "print")
+    {
+        bool printVarHandleSuc = printVarHandle(cmd_vec);   
+        return printVarHandleSuc;
+    }
+    else if(f == "type")
     {
         std::string type_name = getType(var_name);
         if(type_name == "Invalid Type")
@@ -377,6 +432,87 @@ bool Parser::quadrupleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
     err_no = INVALID_INPUT;
     if(quadrupleTokenBuiltin(cmd_vec) || quadrupleVarDeclare(cmd_vec))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
+{
+    // function declaration statement begins with def
+    if(cmd_vec[0] != "def")
+    {
+        return false;
+    }
+
+    // check validility of variable name
+    std::string func_name = cmd_vec[1];
+    if(hasKeyword(func_name))
+    {
+        err_no = KWD_AS_FUNC; // "Cannot use keywords as variable name"
+        return false;
+    }
+    else if(hasBuiltinFuncVar(func_name))
+    {
+        err_no = BUILT_FUNC_AS_FUNC; // Cannot use built-in function name as variable or name
+        return false;
+    }
+    else if(hasFuncVariable(func_name))
+    {
+        err_no = FUNC_AS_VAR;
+        return false;
+    }
+
+    // tokenize parameter list and built expression tree object
+    int j = findMatched(cmd_vec, "(", ")", 3);
+    std::vector<std::string> paramList(cmd_vec.begin() + 3, cmd_vec.begin() + j);
+    std::vector<std::string> expression(cmd_vec.begin() + j + 1, cmd_vec.end());
+    declareFunc(func_name, paramList, expression);
+    return true;
+}
+
+// handle variadic print, supports multiple variables and constants
+bool Parser::printVarHandle(const std::vector<std::string> & cmd_vec)
+{
+    // print() statement begins with "print"
+    if(cmd_vec[0] != "print")
+    {
+        return false;
+    }
+
+    // eg: print(a, b, c, end="HaoJiang")
+    // => print | ( | a | b | c | end | = | "HaoJiang" | ) 
+
+    // management trailing string of output
+    size_t N = cmd_vec.size();
+    std::string endOutput = "\n";
+    if(N >= 4 && cmd_vec[N - 4] == ("end") && cmd_vec[N - 3] == "=") // check whether ending starts with "end="
+    {
+        endOutput = cmd_vec[N - 2];
+        endOutput = endOutput.substr(1, endOutput.length() - 2);
+        N -= 3;
+    }
+    
+    // iterative print variable, function or constant
+    // stop outputing whenever encountering invalid string
+    for(size_t i = 2; i < N - 1; ++i)
+    {
+        std::string token = cmd_vec[i];
+        if((!singleVarHandle(token, true)) && (!singleFuncHandle(token, true)) && (!singleConstHandle(token, true)))
+        {
+            return false;
+        }
+    }
+    std::cout << endOutput << std::flush;
+    return true;
+}
+
+// handle multiple tokens
+bool Parser::multipleTokenHandle(const std::vector<std::string> & cmd_vec)
+{
+    err_no = INVALID_INPUT;
+    if(functionDefHandle(cmd_vec) || printVarHandle(cmd_vec))
     {
         return true;
     }

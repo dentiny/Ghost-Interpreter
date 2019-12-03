@@ -20,6 +20,12 @@ void DataManager::deleteScopeManager()
     scopeArr.pop_back();
 }
 
+// decide whether keyword exists
+bool DataManager::hasKeyword(const std::string & var_name)
+{
+    return keywords.find(var_name) != keywords.end();
+}
+
 // decide whether contains built-in function
 bool DataManager::hasBuiltinFuncVar(const std::string & var_name)
 {
@@ -205,6 +211,13 @@ void DataManager::assignVar(const std::string & var_name, const std::string & va
         }
     }
     std::cout << "Assign value error from DataManager" << std::endl;
+}
+
+// declare function
+void DataManager::declareFunc(const std::string & func_name, std::vector<std::string> & paramList, std::vector<std::string> & expression)
+{
+    auto it = scopeArr.rbegin();
+    it->declareFunc(func_name, paramList, expression);
 }
 
 // declare type and value to variable

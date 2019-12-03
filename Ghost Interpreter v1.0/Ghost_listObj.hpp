@@ -43,9 +43,7 @@ private:
         }
     };
     std::vector<T> val;
-
-    inline void pushClear(std::vector<std::string> & res, std::string & temp); // helper function for tokenize()
-    inline int findMatched(std::string & cmd, char left, char right, int i); // helper function for tokenize()
+    
     std::vector<std::string> tokenize(std::string & s); // helper function of constructor
     std::vector<T> getVal() const; // get value
 

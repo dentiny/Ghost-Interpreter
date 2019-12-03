@@ -7,12 +7,13 @@
 #include "ErrorHandler.hpp"
 #include "Uncommenter.hpp"
 #include "Tokenizer.hpp" 
+#include "DataManager.hpp"
 #include "Parser.hpp"
 #include <vector>
 #include <string>
 #include <iostream>
 
-class CommandGhost : virtual public ErrorHandler, public ExitHandler, public Uncommenter, public Tokenizer, public Parser
+class CommandGhost : public ExitHandler, public Uncommenter, public Tokenizer, public Parser
 {
 public:
     // main function of Command Ghost

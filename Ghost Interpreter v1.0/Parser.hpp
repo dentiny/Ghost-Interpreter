@@ -19,10 +19,10 @@ class Parser : virtual public DataManager, public Comparator
 {
 private:
     unsigned scopeDepth = 0;
-    bool singleScopeHandle(const std::vector<std::string> & cmd_vec); // handle enter and leave scope
-    bool singleVarHandle(const std::vector<std::string> & cmd_vec); // handle single variable
-    bool singleConstHandle(const std::vector<std::string> & cmd_vec); // handle single constant
-    bool singleFuncHandle(const std::vector<std::string> & cmd_vec); // handle single function
+    bool singleScopeHandle(const std::string & token); // handle enter and leave scope
+    bool singleVarHandle(const std::string & token, bool trailMode); // handle single variable
+    bool singleConstHandle(const std::string & token, bool trailMode); // handle single constant
+    bool singleFuncHandle(const std::string & token, bool trailMode); // handle single function
     bool singleTokenHandle(const std::vector<std::string> & cmd_vec); // handle single token
     bool doubleSelfOperation(const std::vector<std::string> & cmd_vec); // handle double token for self-operation
     bool doubleConcatOperation(const std::vector<std::string> & cmd_vec); // handle double token for string concatenation
@@ -34,6 +34,9 @@ private:
     bool quadrupleVarDeclare(const std::vector<std::string> & cmd_vec); // handle quadruple token for variable declaration
     bool quadrupleTokenBuiltin(const std::vector<std::string> & cmd_vec); // handle quadruple token for built-in function with parameter
     bool quadrupleTokenHandle(const std::vector<std::string> & cmd_vec); // handle quadruple token
+    bool functionDefHandle(const std::vector<std::string> & cmd_vec); // handle expression
+    bool printVarHandle(const std::vector<std::string> & cmd_vec); // handle variadic print, supports multiple variables and constants
+    bool multipleTokenHandle(const std::vector<std::string> & cmd_vec); // handle multiple tokens
 
 public:
     bool parse(std::vector<std::string> & cmd_vec)
@@ -78,11 +81,11 @@ public:
             return quadrupleTokenHandleSuc;
         }
 
+        // expression handle
         else
         {
-            err_no = INVALID_INPUT;
-            std::cout << "TBC" << std::endl;
-            return false;
+            bool multipleTokenHandleSuc = multipleTokenHandle(cmd_vec);
+            return multipleTokenHandleSuc;
         }
     }
 };

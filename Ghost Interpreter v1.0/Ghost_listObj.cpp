@@ -8,48 +8,6 @@
 #include <iostream>
 #include <algorithm>
 
-// helper function for tokenize()
-// task is to push back and clear existing string
-inline void Ghost_listObj::pushClear(std::vector<std::string> & res, std::string & temp)
-{
-    if(!temp.empty())
-    {
-        res.push_back(temp);
-        temp.clear();
-    }
-}
-
-// helper function for split()
-// task is to find the next matched right character
-// char c is the character to match(targeted right half)
-// int i is the index of the left character in the cmd string
-inline int Ghost_listObj::findMatched(std::string & cmd, char left, char right, int i)
-{
-    int N = cmd.length();
-    int j = i + 1;
-    size_t left_cnt = 0;
-    for(; j < N; ++j)
-    {
-        char c = cmd[j];
-        if(c == right)
-        {
-           if(left_cnt == 0)
-            {
-                break;
-            }
-            else
-            {
-                --left_cnt;
-            }
-        }
-        else if(c == left)
-        {
-            ++left_cnt;
-        }
-    }
-    return j;
-}
-
 // helper function for constuctor
 // split the string into meaningful substrings which could make a Ghost object
 std::vector<std::string> Ghost_listObj::tokenize(std::string & s)

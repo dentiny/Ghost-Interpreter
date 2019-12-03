@@ -1,6 +1,7 @@
 #ifndef DATA_MANAGER_HPP__
 #define DATA_MANAGER_HPP__
 
+#include "ExprTree.hpp"
 #include "ScopeManager.hpp"
 #include "Ghost_intObj.hpp"
 #include "Ghost_floatObj.hpp"
@@ -26,6 +27,7 @@ public:
     // unordered_set to store built-in function
     const std::unordered_set<std::string> built_in_func
     {
+        "print", // get the value of a constant or a variable
         "val", // get the value of variable
         "type", // get the type of variable
         "query", // get the type and value of variable
@@ -35,6 +37,7 @@ public:
 
     void createScopeManager(); // append ScopeManager into ScopeManager array whenever enter into new scope
     void deleteScopeManager(); // delete ScopeManager from ScopeManager array whenever leave current scope
+    bool hasKeyword(const std::string & var_name); // decide whether keyword exists
     bool hasBuiltinFuncVar(const std::string & var_name); // decide whether built-in function exists
     Ghost_intObj getIntVar(const std::string & var_name); // get Ghost_intObj by its name
     Ghost_floatObj getFloatVar(const std::string & var_name); // get Ghost_floatObj by its name
@@ -48,6 +51,7 @@ public:
     bool postfixOperation(const std::string & var_name, const std::string & op); // apply postfix operation on variable by its name
     void showLocalVar(); // show local variables
     void showVariable(); // show all variables
+    void declareFunc(const std::string & func_name, std::vector<std::string> & paramList, std::vector<std::string> & expression); // declare function
     void assignVar(const std::string & var_name, const std::string & var_val); // assign type and value to variable
     void declareVar(const std::string & var_name, std::string var_val, varType var_type); // declare type and value to variable
     varType getVariableType(const std::string & var_name); // get variable type

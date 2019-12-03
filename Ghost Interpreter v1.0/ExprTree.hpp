@@ -1,11 +1,19 @@
+#ifndef EXPR_TREE_HPP__
+#define EXPR_TREE_HPP__
+
+#include "Ghost_intObj.hpp"
+#include "Ghost_floatObj.hpp"
+#include "Ghost_stringObj.hpp"
+#include "Ghost_listObj.hpp"
+#include "BasicDataManager.hpp"
 #include <string>
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#include <functional>
+#include <unordered_set>
 #include <unordered_map>
 
-class ExprTree
+class ExprTree : virtual BasicDataManager
 {
 private:
     class Node
@@ -28,9 +36,11 @@ private:
         Node(std::string _val) :
             val{_val},
             left{nullptr},
-            right{nullptr},
-            priority{priorityScale[_val]}
-            {}
+            right{nullptr}
+            {
+                // constant or variable
+                priority = (priorityScale.find(val) == priorityScale.end()) ? 0 : priorityScale[_val];
+            }
 
         void updatePriority(unsigned p=3)
         {
@@ -43,44 +53,14 @@ private:
         }
     };
 
-    std::unordered_map<std::string, std::function<int(int, int)>> ops
-    {
-        {"+", [](int num1, int num2) { return num1 + num2; }},
-        {"-", [](int num1, int num2) { return num1 - num2; }},
-        {"*", [](int num1, int num2) { return num1 * num2; }},
-        {"/", [](int num1, int num2) { return num1 / num2; }}
-    };
+    // operators
+    std::unordered_set<std::string> ops{"+", "-", "*", "/"};
 
     // root node of the expression tree
     Node * root;
 
-    // find the first match right parenthesis
-    int findMatched(std::vector<std::string> & expression, int i)
-    {
-        int N = expression.size();
-        int j = i + 1;
-        int left = 0;
-        for(; j < N; ++j)
-        {
-            std::string token = expression[j];
-            if(token == ")")
-            {
-                if(left == 0)
-                {
-                    break;
-                }
-                else
-                {
-                    --left;
-                }
-            }
-            else if(token == "(")
-            {
-                ++left;
-            }
-        }
-        return j;
-    }
+    // parameters of the expression
+    std::vector<std::string> paramTbl;
 
     // character-wise parse expression
     Node * buildTreeHelper(std::vector<std::string> & expression, bool inBrace=false)
@@ -95,7 +75,7 @@ private:
             // bracket
             if(token == "(")
             {
-                int j = findMatched(expression, i);
+                int j = findMatched(expression, "(", ")", i);
                 std::vector<std::string> bracket(expression.begin() + i + 1, expression.begin() + j);
                 Node * p = buildTreeHelper(bracket, true);
                 i = j;
@@ -176,17 +156,17 @@ private:
         return r;
     }
 
-    // helper function for eval()
-    // recursively eval the node
-    int evalHelper(Node * r)
+    // helper function for copy constructor and copy assignment
+    Node * copyHelper(Node * current)
     {
-        if(r->left != nullptr && r->right != nullptr)
+        if(current == nullptr)
         {
-            int leftVal = evalHelper(r->left);
-            int rightVal = evalHelper(r->right);
-            return ops[r->val](leftVal, rightVal);
+            return nullptr;
         }
-        return stol(r->val);
+        Node * r = new Node(current->val);
+        r->left = copyHelper(current->left);
+        r->right = copyHelper(current->right);
+        return r;
     }
 
     // helper function for delete()
@@ -202,19 +182,54 @@ private:
     }
 
 public:
-    // constructor
-    ExprTree() : root{nullptr} {}    
+    // default constructor
+    ExprTree() : root{nullptr} {}
 
-    // build the expression tree
-    void buildTree(std::vector<std::string> & expression)
+    // constructor
+    ExprTree(std::vector<std::string> & _paramTbl, std::vector<std::string> & _expression) : 
+        root{nullptr},
+        paramTbl{_paramTbl}
     {
-        root = buildTreeHelper(expression);
+        root = buildTreeHelper(_expression);
+    }    
+
+    // copy constructor
+    ExprTree(const ExprTree & rhs) : 
+        root{nullptr},
+        paramTbl{rhs.paramTbl}
+    {
+        root = copyHelper(rhs.root);
     }
 
-    // evaluate the expression
-    int eval()
+    // copy assignment
+    ExprTree & operator=(const ExprTree & rhs)
     {
-        return evalHelper(root);
+        if(this != &rhs)
+        {
+            deleteHelper(root);
+            root = copyHelper(rhs.root);
+            paramTbl = rhs.paramTbl;
+        }
+        return *this;
+    }
+
+    // move constructor
+    ExprTree(ExprTree && rhs) :
+        root{nullptr}
+    {
+        std::swap(root, rhs.root);
+        std::swap(paramTbl, rhs.paramTbl);
+    }
+
+    // move assignment
+    ExprTree & operator=(ExprTree && rhs)
+    {
+        if(this != &rhs)
+        {
+            std::swap(root, rhs.root);
+            std::swap(paramTbl, rhs.paramTbl);
+        }
+        return *this;
     }
 
     // destructor
@@ -223,3 +238,5 @@ public:
         deleteHelper(root);
     }
 };
+
+#endif

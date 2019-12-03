@@ -29,7 +29,10 @@ public:
         INVALID_FUNC, // invalid function called
         NO_VAR_CONST_FUNC, // not a valid variable, constant or function
         SELF_OP_ERROR, // self-operation error
-        INVALID_ARG_LIST // invalid arguments for list construction
+        INVALID_ARG_LIST, // invalid arguments for list construction
+        KWD_AS_FUNC, // keyword as function name
+        BUILT_FUNC_AS_FUNC, // usage of built-in function as function name
+        FUNC_REDEF // function re-definition
     };
     
     const std::array<std::string, 20> errMsg = 
@@ -49,7 +52,10 @@ public:
         "Invalid function called",
         "Not a valid variable, constant or function",
         "Self operation error",
-        "Invalid arguments for list construction"
+        "Invalid arguments for list construction",
+        "Cannot use keywords as function name",
+        "Cannot use built-in function name as function name",
+        "Function re-definition"
     };
 };
 

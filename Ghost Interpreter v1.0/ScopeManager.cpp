@@ -1,3 +1,4 @@
+#include "ExprTree.hpp"
 #include "ScopeManager.hpp"
 #include <string>
 
@@ -6,7 +7,7 @@ ScopeManager & ScopeManager::operator=(const ScopeManager & rhs)
 {
     if(this != &rhs)
     {
-        function = rhs.function;
+        funcTbl = rhs.funcTbl;
         varTbl = rhs.varTbl;
         intTbl = rhs.intTbl;
         floatTbl = rhs.floatTbl;
@@ -130,7 +131,7 @@ std::string ScopeManager::getVariable(const std::string & var_name)
 // decide whether function variable by its name
 bool ScopeManager::hasFuncVariable(const std::string & var_name)
 {
-    return function.find(var_name) != function.end();
+    return funcTbl.find(var_name) != funcTbl.end();
 }
 
 // decide whether there's integer by its name
@@ -271,6 +272,16 @@ void ScopeManager::assignVar(const std::string & var_name, const std::string & v
         return;
     }
     std::cout << "Assignment error in ScopeManager" << std::endl;
+}
+
+// declare function
+void ScopeManager::declareFunc(const std::string & func_name, std::vector<std::string> & paramList, std::vector<std::string> & expression)
+{
+    if(hasFuncVariable(func_name))
+    {
+        std::cout << "Declare function error from ScopeManager" << std::endl;
+    }
+    funcTbl[func_name] = ExprTree(paramList, expression);
 }
 
 // declare type and value to variable

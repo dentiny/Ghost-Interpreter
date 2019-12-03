@@ -1,21 +1,20 @@
 #ifndef SCOPE_MANAGER_HPP__
 #define SCOPE_MANAGER_HPP__
 
+#include "ExprTree.hpp"
 #include "Ghost_intObj.hpp"
 #include "Ghost_floatObj.hpp"
 #include "Ghost_stringObj.hpp"
 #include "Ghost_listObj.hpp"
 #include "BasicDataManager.hpp"
 #include <string>
-#include <map>
-#include <unordered_set>
 #include <unordered_map>
 
 class ScopeManager : virtual public BasicDataManager
 {
 private:
     // self-defined function
-    std::unordered_set<std::string> function;
+    std::unordered_map<std::string, ExprTree> funcTbl;
 
     // symbol table
 //    std::map<std::string, varType> varTbl;
@@ -27,7 +26,7 @@ private:
 
 public:
     ScopeManager() : 
-        function{},
+        funcTbl{},
         varTbl{},
         intTbl{},
         floatTbl{},
@@ -35,7 +34,7 @@ public:
         listTbl{}
         {} // default constructor
     ScopeManager(const ScopeManager & rhs) :
-        function{rhs.function},
+        funcTbl{rhs.funcTbl},
         varTbl{rhs.varTbl},
         intTbl{rhs.intTbl},
         floatTbl{rhs.floatTbl},
@@ -59,6 +58,7 @@ public:
     bool prefixOperation(const std::string & op, const std::string & var_name); // apply prefix operation on variable by its name
     bool postfixOperation(const std::string & var_name, const std::string & op); // apply postfix operation on variable by its name
     void showVariable(); // display all variables in this scope
+    void declareFunc(const std::string & func_name, std::vector<std::string> & paramList, std::vector<std::string> & expression); // declare function
     void assignVar(const std::string & var_name, const std::string & var_val); // assign value and type to variable
     void declareVar(const std::string & var_name, std::string var_val, varType var_type); // declare type and value to variable
     varType getVariableType(const std::string & var_name); // get variable type
