@@ -119,11 +119,11 @@ public:
 
         // the last part of the command
         pushClear(ops, op);
-
+/*
         // debug information
         std::for_each(ops.begin(), ops.end(), [](std::string s) { std::cout << s << " | " << std::flush; });
         std::cout << std::endl;
-        
+*/        
         return ops;
     }
 };

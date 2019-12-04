@@ -61,10 +61,11 @@ public:
     std::string getVal(const std::string & var_name); // get variable value by its name in string version
     std::string queryVar(const std::string & var_name); // get variable's type and value in string version
     varType evalRetType(const std::vector<std::string> & argList, ExprTree & exp); // evaluate the return type of expression
-    Ghost_intObj evalInteger(const std::vector<std::string> & argList, ExprTree & exp); // evaluate integer expression
-    Ghost_floatObj evalFloat(const std::vector<std::string> & argList, ExprTree & exp); // evaluate float expression
-    Ghost_stringObj evalString(const std::vector<std::string> & argList, ExprTree & exp); // evaluate string expression
-    Ghost_listObj evalList(const std::vector<std::string> & argList, ExprTree & exp); // evaluate list expression
+    void funcArgHandle(std::vector<std::string> & argList); // before argument evaluation, convert variable into string version 
+    Ghost_intObj evalInteger(std::vector<std::string> & argList, ExprTree & exp); // evaluate integer expression
+    Ghost_floatObj evalFloat(std::vector<std::string> & argList, ExprTree & exp); // evaluate float expression
+    Ghost_stringObj evalString(std::vector<std::string> & argList, ExprTree & exp); // evaluate string expression
+    Ghost_listObj evalList(std::vector<std::string> & argList, ExprTree & exp); // evaluate list expression
 };
 
 #endif

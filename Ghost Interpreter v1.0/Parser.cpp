@@ -586,7 +586,6 @@ bool Parser::functionExecuteHandle(const std::vector<std::string> & cmd_vec)
     }
     else if(retType == varType::STRING_VAR)
     {
-        std::cout << "ensure return type is string" << std::endl;
         Ghost_stringObj res = evalString(argList, exp);
         std::cout << res << std::endl;
         return true;

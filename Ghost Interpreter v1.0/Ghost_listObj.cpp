@@ -68,11 +68,11 @@ std::vector<std::string> Ghost_listObj::tokenize(std::string & s)
 
     // the last part of the command
     pushClear(res, temp);
-
+/*
     // debug information
     std::for_each(res.begin(), res.end(), [](std::string s) { std::cout << s << " | " << std::flush; });
     std::cout << std::endl;
-    
+*/    
     return res;
 }   
 
@@ -244,7 +244,7 @@ std::vector<Ghost_listObj::T> Ghost_listObj::getVal() const
 std::string Ghost_listObj::getVal_s() const
 {
     std::vector<T> val = getVal();
-    std::string val_s;
+    std::string val_s = "[";
     for(auto it = val.begin(); it != val.end(); ++it)
     {
         varType typeRes = it->type;
@@ -266,6 +266,7 @@ std::string Ghost_listObj::getVal_s() const
         }
         val_s += "  ";
     }
+    val_s += "]";
     return val_s;
 }
 

@@ -50,12 +50,8 @@ public:
             bool ifValid = parse(cmd_vec);
             if(!ifValid)
             {
-                std::cout << ErrorHandler::errMsg[err_no] << std::endl;
-                continue;
+                std::cout << errMsg[err_no] << std::endl;
             }
-
-            // final step: parse the command line and calculate
-//            std::cout << calculate(cmd) << std::endl;
         }
 
         // delete default ScopeManager when exiting main scope

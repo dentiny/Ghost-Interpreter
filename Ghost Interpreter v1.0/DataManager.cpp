@@ -328,30 +328,49 @@ BasicDataManager::varType DataManager::evalRetType(const std::vector<std::string
     return retType;
 }
 
-// evaluate integer expression
-Ghost_intObj DataManager::evalInteger(const std::vector<std::string> & argList, ExprTree & exp)
+// since there's no easy way to pass variables directly to expression for evaluation
+// before argument evaluation, convert variable into string version 
+// expression tree may treat them as constant value and convert them to object
+void DataManager::funcArgHandle(std::vector<std::string> & argList)
 {
+    for(size_t i = 0; i < argList.size(); ++i)
+    {
+        std::string arg = argList[i];
+        if(hasVariable(arg))
+        {
+            argList[i] = getVal(arg);
+        }
+    }
+}
+
+// evaluate integer expression
+Ghost_intObj DataManager::evalInteger(std::vector<std::string> & argList, ExprTree & exp)
+{
+    funcArgHandle(argList);
     Ghost_intObj res = exp.evalInteger(argList);
     return res;
 }
 
 // evaluate float expression
-Ghost_floatObj DataManager::evalFloat(const std::vector<std::string> & argList, ExprTree & exp)
+Ghost_floatObj DataManager::evalFloat(std::vector<std::string> & argList, ExprTree & exp)
 {
+    funcArgHandle(argList);
     Ghost_floatObj res = exp.evalFloat(argList);
     return res;
 }
 
 // evaluate string expression
-Ghost_stringObj DataManager::evalString(const std::vector<std::string> & argList, ExprTree & exp)
+Ghost_stringObj DataManager::evalString(std::vector<std::string> & argList, ExprTree & exp)
 {
+    funcArgHandle(argList);
     Ghost_stringObj res = exp.evalString(argList);
     return res;
 }
 
 // evaluate list expression
-Ghost_listObj DataManager::evalList(const std::vector<std::string> & argList, ExprTree & exp)
+Ghost_listObj DataManager::evalList(std::vector<std::string> & argList, ExprTree & exp)
 {
+    funcArgHandle(argList);
     Ghost_listObj res = exp.evalList(argList);
     return res;
 }
