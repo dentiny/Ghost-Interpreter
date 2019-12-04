@@ -10,12 +10,15 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 #include <unordered_set>
 #include <unordered_map>
 
 class ExprTree : virtual public BasicDataManager
 {
 private:
+    using varType = BasicDataManager::varType;
+
     class Node
     {
     private:
@@ -53,9 +56,6 @@ private:
         }
     };
 
-    // operators
-    std::unordered_set<std::string> ops{"+", "-", "*", "/"};
-
     // root node of the expression tree
     Node * root;
 
@@ -69,10 +69,48 @@ private:
     // using formal argument as key, actual argument as value
     std::unordered_map<std::string, std::string> argMap;
 
+    // operator
+    std::unordered_set<std::string> ops {"+", "-", "*", "/"};
+
+    // Ghost_intObj
+    std::unordered_map<std::string, std::function<Ghost_intObj(Ghost_intObj, Ghost_intObj)>> intOps
+    {
+        {"+", [](Ghost_intObj obj1, Ghost_intObj obj2) { return obj1 + obj2; }},
+        {"-", [](Ghost_intObj obj1, Ghost_intObj obj2) { return obj1 - obj2; }},
+        {"*", [](Ghost_intObj obj1, Ghost_intObj obj2) { return obj1 * obj2; }},
+        {"/", [](Ghost_intObj obj1, Ghost_intObj obj2) { return obj1 / obj2; }}
+    };
+
+    // Ghost_floatObj
+    std::unordered_map<std::string, std::function<Ghost_floatObj(Ghost_floatObj, Ghost_floatObj)>> floatOps
+    {
+        {"+", [](Ghost_floatObj obj1, Ghost_floatObj obj2) { return obj1 + obj2; }},
+        {"-", [](Ghost_floatObj obj1, Ghost_floatObj obj2) { return obj1 - obj2; }},
+        {"*", [](Ghost_floatObj obj1, Ghost_floatObj obj2) { return obj1 * obj2; }},
+        {"/", [](Ghost_floatObj obj1, Ghost_floatObj obj2) { return obj1 / obj2; }}
+    };
+
+    // Ghost_stringObj
+    std::unordered_map<std::string, std::function<Ghost_stringObj(Ghost_stringObj, Ghost_stringObj)>> stringOps
+    {
+        {"+", [](Ghost_stringObj obj1, Ghost_stringObj obj2) { return obj1 + obj2; }}
+    };
+
+    // Ghost_listObj
+    std::unordered_map<std::string, std::function<Ghost_listObj(Ghost_listObj, Ghost_listObj)>> listOps
+    {
+        {"+", [](Ghost_listObj obj1, Ghost_listObj obj2) { return obj1 + obj2; }}
+    };
+
     Node * buildTreeHelper(std::vector<std::string> & expression, bool inBrace); // character-wise parse expression
     Node * copyHelper(Node * current); // helper function for copy constructor and copy assignment    
     void evalRetTypeHelper(Node * r); // pre-evaluate the return type of the expression after building the expression tree    
     void deleteHelper(Node * r); // recursively de-allocate allocated memory
+    inline void setArgMap(const std::vector<std::string> & argList); // update argument mapping table everytime call function
+    Ghost_intObj evalIntHelper(Node * r); // evaluate Ghost_intObj
+    Ghost_floatObj evalFloatHelper(Node * r); // evaluate Ghost_floatObj
+    Ghost_stringObj evalStringHelper(Node * r); // evaluate Ghost_stringObj
+    Ghost_listObj evalListHelper(Node * r); // evaluate Ghost_listObj
 
 public:
     // default constructor
@@ -147,27 +185,10 @@ public:
     bool isValidArgument(const std::vector<std::string> & _argTbl) const; // check validility of argument list
     varType getRetType() const; // get pre-evaluated return type
 
-
-
-
-    void inorder(Node * r)
-    {
-        if(r != nullptr)
-        {
-            inorder(r->left);
-            std::cout << r->val << " " << std::flush;
-            inorder(r->right);
-        }
-    }
-
-
-    void inorder()
-    {
-        inorder(root);
-    }
-
-
-
+    Ghost_intObj evalInteger(const std::vector<std::string> & argList); // evaluate integer
+    Ghost_floatObj evalFloat(const std::vector<std::string> & argList); // evaluate float
+    Ghost_stringObj evalString(const std::vector<std::string> & argList); // evaluate string
+    Ghost_listObj evalList(const std::vector<std::string> & argList); // evaluate list
 };
 
 #endif

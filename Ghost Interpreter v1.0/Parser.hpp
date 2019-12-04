@@ -19,6 +19,7 @@ class Parser : virtual public DataManager, public Comparator
 {
 private:
     unsigned scopeDepth = 0;
+    bool checkArgInExpression(const std::vector<std::string> & argList, const std::vector<std::string> & expression); // check whether arguments in expression
     bool singleScopeHandle(const std::string & token); // handle enter and leave scope
     bool singleVarHandle(const std::string & token, bool trailMode); // handle single variable
     bool singleConstHandle(const std::string & token, bool trailMode); // handle single constant
@@ -36,6 +37,7 @@ private:
     bool quadrupleTokenHandle(const std::vector<std::string> & cmd_vec); // handle quadruple token
     bool functionDefHandle(const std::vector<std::string> & cmd_vec); // handle expression
     bool printVarHandle(const std::vector<std::string> & cmd_vec); // handle variadic print, supports multiple variables and constants
+    bool functionExecuteHandle(const std::vector<std::string> & cmd_vec); // handle function execution
     bool multipleTokenHandle(const std::vector<std::string> & cmd_vec); // handle multiple tokens
 
 public:
@@ -53,15 +55,21 @@ public:
         else if(cmd_vec.size() == 1)
         {
             bool singleTokenHandleSuc = singleTokenHandle(cmd_vec);
-            return singleTokenHandleSuc;
+            if(singleTokenHandleSuc)
+            {
+                return true;
+            }
         }
 
         // (1) self-increment and self-decrement: x++
         // (2) string concatenation: "aaa""bbb" => "aaabbb"
         else if(cmd_vec.size() == 2)
         {
-            bool doubleVarHandleSuc = doubleTokenHandle(cmd_vec);
-            return doubleVarHandleSuc;
+            bool doubleTokenHandleSuc = doubleTokenHandle(cmd_vec);
+            if(doubleTokenHandleSuc)
+            {
+                return true;
+            }
         }
 
         // (1) handle triple token for built-in function => show_local(), show_global(), show_var()
@@ -70,7 +78,10 @@ public:
         else if(cmd_vec.size() == 3)
         {
             bool tripleTokenHandleSuc = tripleTokenHandle(cmd_vec);
-            return tripleTokenHandleSuc;
+            if(tripleTokenHandleSuc)
+            {
+                return true;
+            }
         }
 
         // (1) handle quadruple token for built-in function with parameter => type(v), val(v), query(v)
@@ -78,15 +89,15 @@ public:
         else if(cmd_vec.size() == 4)
         {
             bool quadrupleTokenHandleSuc = quadrupleTokenHandle(cmd_vec);
-            return quadrupleTokenHandleSuc;
+            if(quadrupleTokenHandleSuc)
+            {
+                return true;
+            }
         }
 
         // expression handle
-        else
-        {
-            bool multipleTokenHandleSuc = multipleTokenHandle(cmd_vec);
-            return multipleTokenHandleSuc;
-        }
+        bool multipleTokenHandleSuc = multipleTokenHandle(cmd_vec);
+        return multipleTokenHandleSuc;
     }
 };
 

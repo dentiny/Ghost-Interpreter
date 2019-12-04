@@ -10,6 +10,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <unordered_set>
 
 // helper function for singleTokenHandle()
 // enter into and leave from scope
@@ -438,6 +439,22 @@ bool Parser::quadrupleTokenHandle(const std::vector<std::string> & cmd_vec)
     return false;
 }
 
+// helper function for functionDefHandle()
+// check whether arguments in expression
+// return true if valid, else return false
+bool Parser::checkArgInExpression(const std::vector<std::string> & argList, const std::vector<std::string> & expression)
+{   
+    std::unordered_set<std::string> expressionKwd(expression.begin(), expression.end());
+    for(const std::string & arg : argList)
+    {
+        if(expressionKwd.find(arg) == expressionKwd.end())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
 {
     // function declaration statement begins with def
@@ -466,9 +483,17 @@ bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
 
     // tokenize parameter list and built expression tree object
     int j = findMatched(cmd_vec, "(", ")", 3);
-    std::vector<std::string> paramList(cmd_vec.begin() + 3, cmd_vec.begin() + j);
-    std::vector<std::string> expression(cmd_vec.begin() + j + 1, cmd_vec.end());
-    declareFunc(func_name, paramList, expression);
+    std::vector<std::string> argList(cmd_vec.begin() + 3, cmd_vec.begin() + j);
+    std::vector<std::string> expression(cmd_vec.begin() + j + 2, cmd_vec.end());
+
+    // check arguments if exist in expression
+    if(!checkArgInExpression(argList, expression))
+    {
+        err_no = ARG_NOT_EXPR;
+        return false;
+    }
+
+    declareFunc(func_name, argList, expression);
     return true;
 }
 
@@ -508,11 +533,74 @@ bool Parser::printVarHandle(const std::vector<std::string> & cmd_vec)
     return true;
 }
 
+// handle function execution
+bool Parser::functionExecuteHandle(const std::vector<std::string> & cmd_vec)
+{
+    // check whether function call
+    if(!hasFuncVariable(cmd_vec[0]) || cmd_vec[1] != "(" || cmd_vec.back() != ")")
+    {
+        return false;
+    }
+
+    // get argument list
+    std::string func_name = cmd_vec[0];
+    ExprTree exp = getFuncVar(func_name);
+    std::vector<std::string> argList(cmd_vec.begin() + 2, cmd_vec.begin() + (cmd_vec.size() - 1));
+    bool argValid = exp.isValidArgument(argList);
+
+    // check argument number
+    if(!argValid)
+    {
+        err_no = ARG_FAULT;
+        return false;
+    }
+
+    // check argument either variable or constant
+    for(std::string var_name : argList)
+    {
+        if(!hasVariable(var_name) && !isConst(var_name))
+        {
+            err_no = ARG_FAULT;
+            return false;
+        }
+    }
+
+    // evaluate the function call
+    varType retType = evalRetType(argList, exp);
+    if(retType == varType::INT_VAR)
+    {
+        Ghost_intObj res = evalInteger(argList, exp);
+        std::cout << res << std::endl;
+        return true;
+    }
+    else if(retType == varType::FLOAT_VAR)
+    {
+        Ghost_floatObj res = evalFloat(argList, exp);
+        std::cout << res << std::endl;
+        return true;
+    }
+    else if(retType == varType::STRING_VAR)
+    {
+        std::cout << "ensure return type is string" << std::endl;
+        Ghost_stringObj res = evalString(argList, exp);
+        std::cout << res << std::endl;
+        return true;
+    }
+    else if(retType == varType::LIST_VAR)
+    {
+        Ghost_listObj res = evalList(argList, exp);
+        std::cout << res << std::endl;
+        return true;
+    }
+    std::cout << "Return type error in Parser" << std::endl;
+    return false;
+}
+
 // handle multiple tokens
 bool Parser::multipleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
     err_no = INVALID_INPUT;
-    if(functionDefHandle(cmd_vec) || printVarHandle(cmd_vec))
+    if(functionDefHandle(cmd_vec) || printVarHandle(cmd_vec) || functionExecuteHandle(cmd_vec))
     {
         return true;
     }

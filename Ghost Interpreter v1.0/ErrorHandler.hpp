@@ -32,10 +32,12 @@ public:
         INVALID_ARG_LIST, // invalid arguments for list construction
         KWD_AS_FUNC, // keyword as function name
         BUILT_FUNC_AS_FUNC, // usage of built-in function as function name
-        FUNC_REDEF // function re-definition
+        FUNC_REDEF, // function re-definition
+        ARG_FAULT, // wrong argument for the function called
+        ARG_NOT_EXPR // argument doesn't exist in expression
     };
     
-    const std::array<std::string, 20> errMsg = 
+    const std::array<std::string, 50> errMsg = 
     {
         "Exit program successfully",
         "Use exit() or quit() to exit",
@@ -55,7 +57,9 @@ public:
         "Invalid arguments for list construction",
         "Cannot use keywords as function name",
         "Cannot use built-in function name as function name",
-        "Function re-definition"
+        "Function re-definition",
+        "Wrong argument for the function called",
+        "Arguments doesn't exist in expression"
     };
 };
 

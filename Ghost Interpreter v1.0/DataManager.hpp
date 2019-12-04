@@ -11,7 +11,7 @@
 #include <string>
 #include <unordered_set>
 
-struct DataManager : virtual public BasicDataManager
+class DataManager : virtual public BasicDataManager
 {
 private:
     std::list<ScopeManager> scopeArr;
@@ -35,6 +35,7 @@ public:
         "show_var" // display all variables
     };
 
+    bool isConst(const std::string & var); // decide whether the var could be a constant value
     void createScopeManager(); // append ScopeManager into ScopeManager array whenever enter into new scope
     void deleteScopeManager(); // delete ScopeManager from ScopeManager array whenever leave current scope
     bool hasKeyword(const std::string & var_name); // decide whether keyword exists
@@ -43,6 +44,7 @@ public:
     Ghost_floatObj getFloatVar(const std::string & var_name); // get Ghost_floatObj by its name
     Ghost_stringObj getStringVar(const std::string & var_name); // get Ghost_stringObj by its name
     Ghost_listObj getListVar(const std::string & var_name); // get Ghost_listObj by its name
+    ExprTree getFuncVar(const std::string & func_name); // get ExprTree object by its name
     bool hasVariable(const std::string & var_name); // decide whether there's variable by its name
     std::string getVariable(const std::string & var_name); // get variable by its name in string version
     bool hasFuncVariable(const std::string & var_name); // decide whether there's function by its name
@@ -51,13 +53,18 @@ public:
     bool postfixOperation(const std::string & var_name, const std::string & op); // apply postfix operation on variable by its name
     void showLocalVar(); // show local variables
     void showVariable(); // show all variables
-    void declareFunc(const std::string & func_name, std::vector<std::string> & paramList, std::vector<std::string> & expression); // declare function
+    void declareFunc(const std::string & func_name, std::vector<std::string> & argList, std::vector<std::string> & expression); // declare function
     void assignVar(const std::string & var_name, const std::string & var_val); // assign type and value to variable
     void declareVar(const std::string & var_name, std::string var_val, varType var_type); // declare type and value to variable
     varType getVariableType(const std::string & var_name); // get variable type
     std::string getType(const std::string & var_name); // get variable type by its name in string version
     std::string getVal(const std::string & var_name); // get variable value by its name in string version
     std::string queryVar(const std::string & var_name); // get variable's type and value in string version
+    varType evalRetType(const std::vector<std::string> & argList, ExprTree & exp); // evaluate the return type of expression
+    Ghost_intObj evalInteger(const std::vector<std::string> & argList, ExprTree & exp); // evaluate integer expression
+    Ghost_floatObj evalFloat(const std::vector<std::string> & argList, ExprTree & exp); // evaluate float expression
+    Ghost_stringObj evalString(const std::vector<std::string> & argList, ExprTree & exp); // evaluate string expression
+    Ghost_listObj evalList(const std::vector<std::string> & argList, ExprTree & exp); // evaluate list expression
 };
 
 #endif

@@ -190,7 +190,7 @@ Ghost_floatObj & Ghost_floatObj::operator+=(Ghost_floatObj & rhs)
 Ghost_floatObj Ghost_floatObj::operator-(Ghost_floatObj & rhs) const
 {
     Ghost_floatObj temp(*this);
-    temp.val += rhs.val;
+    temp.val -= rhs.val;
     return temp;
 }
 

@@ -1,6 +1,13 @@
+#include "ExprTree.hpp"
 #include "DataManager.hpp"
 #include <string>
 #include <iostream>
+
+// decide whether the var could be a constant value
+bool DataManager::isConst(const std::string & var)
+{
+    return getVarType(var) != varType::NULL_VAR;
+}
 
 // append ScopeManager into ScopeManager array whenever enter into new scope
 void DataManager::createScopeManager()
@@ -87,6 +94,20 @@ Ghost_listObj DataManager::getListVar(const std::string & var_name)
     std::cout << "Get List Ghost Object Error" << std::endl;
     return Ghost_listObj();
 }
+
+// get ExprTree object by its name
+ExprTree DataManager::getFuncVar(const std::string & func_name)
+{
+    for(auto it = scopeArr.rbegin(); it != scopeArr.rend(); ++it)
+    {
+        if(it->hasFuncVariable(func_name))
+        {
+            return it->getFuncVar(func_name);
+        }
+    }
+    std::cout << "Get function object error" << std::endl;
+    return ExprTree();
+} 
 
 // decide whether there's variable by its name
 bool DataManager::hasVariable(const std::string & var_name)
@@ -214,10 +235,10 @@ void DataManager::assignVar(const std::string & var_name, const std::string & va
 }
 
 // declare function
-void DataManager::declareFunc(const std::string & func_name, std::vector<std::string> & paramList, std::vector<std::string> & expression)
+void DataManager::declareFunc(const std::string & func_name, std::vector<std::string> & argList, std::vector<std::string> & expression)
 {
     auto it = scopeArr.rbegin();
-    it->declareFunc(func_name, paramList, expression);
+    it->declareFunc(func_name, argList, expression);
 }
 
 // declare type and value to variable
@@ -282,4 +303,55 @@ std::string DataManager::queryVar(const std::string & var_name)
         }
     }
     return "Invalid";
+}
+
+// evaluate the return type of expression
+BasicDataManager::varType DataManager::evalRetType(const std::vector<std::string> & argList, ExprTree & exp)
+{
+    // check return type pre-evaluated by expression tree
+    varType retType = exp.getRetType();
+    if(retType == varType::LIST_VAR || retType == varType::STRING_VAR)
+    {
+        return retType;
+    }
+
+    // check return type by variables
+    for(const std::string & var_name : argList)
+    {
+        varType typeRes = getVariableType(var_name);
+        if(typeRes == varType::LIST_VAR || typeRes == varType::STRING_VAR)
+        {
+            return typeRes;
+        }
+        retType = (retType == varType::INT_VAR) ? typeRes : retType;
+    }
+    return retType;
+}
+
+// evaluate integer expression
+Ghost_intObj DataManager::evalInteger(const std::vector<std::string> & argList, ExprTree & exp)
+{
+    Ghost_intObj res = exp.evalInteger(argList);
+    return res;
+}
+
+// evaluate float expression
+Ghost_floatObj DataManager::evalFloat(const std::vector<std::string> & argList, ExprTree & exp)
+{
+    Ghost_floatObj res = exp.evalFloat(argList);
+    return res;
+}
+
+// evaluate string expression
+Ghost_stringObj DataManager::evalString(const std::vector<std::string> & argList, ExprTree & exp)
+{
+    Ghost_stringObj res = exp.evalString(argList);
+    return res;
+}
+
+// evaluate list expression
+Ghost_listObj DataManager::evalList(const std::vector<std::string> & argList, ExprTree & exp)
+{
+    Ghost_listObj res = exp.evalList(argList);
+    return res;
 }
