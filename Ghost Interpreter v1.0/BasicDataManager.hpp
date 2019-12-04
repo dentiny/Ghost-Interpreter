@@ -13,7 +13,14 @@ struct BasicDataManager : virtual public ErrorHandler
 {
 public:
     // enum class to define variable type
-    enum class varType { INT_VAR, FLOAT_VAR, STRING_VAR, LIST_VAR, NULL_VAR };
+    enum class varType 
+    { 
+        INT_VAR, 
+        FLOAT_VAR, 
+        STRING_VAR, 
+        LIST_VAR, 
+        NULL_VAR 
+    };
 
     // check value type of string command input
     varType getVarType(const std::string & cmd)
@@ -92,7 +99,7 @@ public:
     // task is to find the next matched right character
     // char c is the character to match(targeted right half)
     // int i is the index of the left character in the cmd string
-    int findMatched(const std::vector<std::string> & cmd_vec, const std::string & left, const std::string & right, int i)
+    int findMatched(const std::vector<std::string> & cmd_vec, std::string left, std::string right, int i)
     {
         int j = i + 1;
         int left_cnt = 0;

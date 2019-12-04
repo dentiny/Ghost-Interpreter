@@ -13,7 +13,7 @@
 #include <unordered_set>
 #include <unordered_map>
 
-class ExprTree : virtual BasicDataManager
+class ExprTree : virtual public BasicDataManager
 {
 private:
     class Node
@@ -59,144 +59,44 @@ private:
     // root node of the expression tree
     Node * root;
 
+    // pre-evaluate the return type after building the expression tree
+    varType retType;
+
     // parameters of the expression
-    std::vector<std::string> paramTbl;
+    std::vector<std::string> argTbl;
 
-    // character-wise parse expression
-    Node * buildTreeHelper(std::vector<std::string> & expression, bool inBrace=false)
-    {
-        Node * r = nullptr;
-        Node * cur = nullptr;
-        int N = expression.size();
-        for(int i = 0; i < N; ++i)
-        {
-            std::string token = expression[i];
+    // argument mapping from formal argument ot actual argument
+    // using formal argument as key, actual argument as value
+    std::unordered_map<std::string, std::string> argMap;
 
-            // bracket
-            if(token == "(")
-            {
-                int j = findMatched(expression, "(", ")", i);
-                std::vector<std::string> bracket(expression.begin() + i + 1, expression.begin() + j);
-                Node * p = buildTreeHelper(bracket, true);
-                i = j;
-
-                if(r == nullptr)
-                {
-                    r = p;
-                }
-                else if(r->right == nullptr)
-                {
-                    r->right = p;
-                }
-                else if(cur->right == nullptr)
-                {
-                    cur->right = p;
-                }
-                else 
-                {
-                    std::cout << "Bracket error" << std::endl;
-                }
-            }
-
-            // operand
-            else if(ops.find(token) == ops.end())
-            {
-                Node * p = new Node(token);
-                if(r == nullptr)
-                {
-                    cur = p;
-                }
-                else if(r->right == nullptr)
-                {
-                    r->right = p;
-                }
-                else if(cur->right == nullptr)
-                {
-                    cur->right = p;
-                }
-                else
-                {
-                    std::cout << "Operand error" << std::endl;
-                }
-            }
-
-            // operator
-            else if(ops.find(token) != ops.end())
-            {
-                Node * p = new Node(token);
-                if(r == nullptr)
-                {
-                    r = p;
-                    r->left = cur;
-                    cur = nullptr;
-                }
-                else if(p->getPriority() <= r->getPriority())
-                {
-                    p->left = r;
-                    r = p;
-                    cur = nullptr;
-                }
-                else if(p->getPriority() > r->getPriority())
-                {
-                    p->left = r->right;
-                    r->right = p;
-                    cur = p;
-                }
-                else
-                {
-                    std::cout << "Operator error" << std::endl;
-                }
-            }
-        }
-
-        if(inBrace)
-        {
-            r->updatePriority();
-        }
-        return r;
-    }
-
-    // helper function for copy constructor and copy assignment
-    Node * copyHelper(Node * current)
-    {
-        if(current == nullptr)
-        {
-            return nullptr;
-        }
-        Node * r = new Node(current->val);
-        r->left = copyHelper(current->left);
-        r->right = copyHelper(current->right);
-        return r;
-    }
-
-    // helper function for delete()
-    // recursively de-allocate allocated memory
-    void deleteHelper(Node * r)
-    {
-        if(r != nullptr)
-        {
-            deleteHelper(r->left);
-            deleteHelper(r->right);
-            delete r;
-        }
-    }
+    Node * buildTreeHelper(std::vector<std::string> & expression, bool inBrace); // character-wise parse expression
+    Node * copyHelper(Node * current); // helper function for copy constructor and copy assignment    
+    void evalRetTypeHelper(Node * r); // pre-evaluate the return type of the expression after building the expression tree    
+    void deleteHelper(Node * r); // recursively de-allocate allocated memory
 
 public:
     // default constructor
-    ExprTree() : root{nullptr} {}
+    ExprTree() : 
+        root{nullptr},
+        retType{varType::NULL_VAR} 
+        {}
 
     // constructor
-    ExprTree(std::vector<std::string> & _paramTbl, std::vector<std::string> & _expression) : 
+    ExprTree(std::vector<std::string> & _argTbl, std::vector<std::string> & _expression) : 
         root{nullptr},
-        paramTbl{_paramTbl}
+        retType{varType::NULL_VAR},
+        argTbl{_argTbl}
     {
-        root = buildTreeHelper(_expression);
+        root = buildTreeHelper(_expression, false);
+        evalRetTypeHelper(root);
     }    
 
     // copy constructor
     ExprTree(const ExprTree & rhs) : 
         root{nullptr},
-        paramTbl{rhs.paramTbl}
+        retType{rhs.retType},
+        argTbl{rhs.argTbl},
+        argMap{rhs.argMap}
     {
         root = copyHelper(rhs.root);
     }
@@ -208,7 +108,9 @@ public:
         {
             deleteHelper(root);
             root = copyHelper(rhs.root);
-            paramTbl = rhs.paramTbl;
+            retType = rhs.retType;
+            argTbl = rhs.argTbl;
+            argMap = rhs.argMap;
         }
         return *this;
     }
@@ -218,7 +120,9 @@ public:
         root{nullptr}
     {
         std::swap(root, rhs.root);
-        std::swap(paramTbl, rhs.paramTbl);
+        std::swap(retType, rhs.retType);
+        std::swap(argTbl, rhs.argTbl);
+        std::swap(argMap, rhs.argMap);
     }
 
     // move assignment
@@ -227,16 +131,43 @@ public:
         if(this != &rhs)
         {
             std::swap(root, rhs.root);
-            std::swap(paramTbl, rhs.paramTbl);
+            std::swap(retType, rhs.retType);
+            std::swap(argTbl, rhs.argTbl);
+            std::swap(argMap, rhs.argMap);
         }
         return *this;
     }
 
     // destructor
-    ~ExprTree()
+    ~ExprTree() noexcept
     {
         deleteHelper(root);
     }
+
+    bool isValidArgument(const std::vector<std::string> & _argTbl) const; // check validility of argument list
+    varType getRetType() const; // get pre-evaluated return type
+
+
+
+
+    void inorder(Node * r)
+    {
+        if(r != nullptr)
+        {
+            inorder(r->left);
+            std::cout << r->val << " " << std::flush;
+            inorder(r->right);
+        }
+    }
+
+
+    void inorder()
+    {
+        inorder(root);
+    }
+
+
+
 };
 
 #endif

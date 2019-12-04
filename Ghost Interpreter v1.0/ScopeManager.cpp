@@ -91,6 +91,23 @@ Ghost_listObj ScopeManager::getListVar(const std::string & var_name)
     return Ghost_listObj();
 }
 
+// decide whether function variable by its name
+bool ScopeManager::hasFuncVariable(const std::string & var_name)
+{
+    return funcTbl.find(var_name) != funcTbl.end();
+}
+
+// get function object by its name
+ExprTree ScopeManager::getFuncVar(const std::string & func_name)
+{
+    if(hasFuncVariable(func_name))
+    {
+        return funcTbl[func_name];
+    }
+    std::cout << "Get function object error in ScopeManager" << std::endl;
+    return ExprTree();
+}
+
 // decide whether symbol table in scope contains variable by its name
 bool ScopeManager::hasVariable(const std::string & var_name)
 {
@@ -126,12 +143,6 @@ std::string ScopeManager::getVariable(const std::string & var_name)
     }
     std::cout << "Get Variable Error From ScopeManager" << std::endl;
     return "";
-}
-
-// decide whether function variable by its name
-bool ScopeManager::hasFuncVariable(const std::string & var_name)
-{
-    return funcTbl.find(var_name) != funcTbl.end();
 }
 
 // decide whether there's integer by its name
@@ -275,13 +286,13 @@ void ScopeManager::assignVar(const std::string & var_name, const std::string & v
 }
 
 // declare function
-void ScopeManager::declareFunc(const std::string & func_name, std::vector<std::string> & paramList, std::vector<std::string> & expression)
+void ScopeManager::declareFunc(const std::string & func_name, std::vector<std::string> & argList, std::vector<std::string> & expression)
 {
     if(hasFuncVariable(func_name))
     {
         std::cout << "Declare function error from ScopeManager" << std::endl;
     }
-    funcTbl[func_name] = ExprTree(paramList, expression);
+    funcTbl[func_name] = ExprTree(argList, expression);
 }
 
 // declare type and value to variable

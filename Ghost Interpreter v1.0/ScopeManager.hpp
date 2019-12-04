@@ -51,14 +51,15 @@ public:
     Ghost_stringObj getStringVar(const std::string & var_name); // get Ghost_stringObj
     bool hasListVar(const std::string & var_name); // decide whether has variable
     Ghost_listObj getListVar(const std::string & var_name); // get Ghost_listObj
+    bool hasFuncVariable(const std::string & var_name); // decide whether function variable by its name
+    ExprTree getFuncVar(const std::string & func_name); // get function object by its name
     bool hasVariable(const std::string & var_name); // decide whether symbol table in scope contains variable by its name
     std::string getVariable(const std::string & var_name); // get variable in string version by its name
-    bool hasFuncVariable(const std::string & var_name); // decide whether function variable by its name
     bool hasIntVariable(const std::string & var_name); // decide whether there's integer by its name
     bool prefixOperation(const std::string & op, const std::string & var_name); // apply prefix operation on variable by its name
     bool postfixOperation(const std::string & var_name, const std::string & op); // apply postfix operation on variable by its name
     void showVariable(); // display all variables in this scope
-    void declareFunc(const std::string & func_name, std::vector<std::string> & paramList, std::vector<std::string> & expression); // declare function
+    void declareFunc(const std::string & func_name, std::vector<std::string> & argList, std::vector<std::string> & expression); // declare function
     void assignVar(const std::string & var_name, const std::string & var_val); // assign value and type to variable
     void declareVar(const std::string & var_name, std::string var_val, varType var_type); // declare type and value to variable
     varType getVariableType(const std::string & var_name); // get variable type
