@@ -34,7 +34,8 @@ public:
         BUILT_FUNC_AS_FUNC, // usage of built-in function as function name
         FUNC_REDEF, // function re-definition
         ARG_FAULT, // wrong argument for the function called
-        ARG_NOT_EXPR // argument doesn't exist in expression
+        ARG_NOT_EXPR, // argument doesn't exist in expression
+        NO_ARG // No argument provided for this expression
     };
     
     const std::array<std::string, 50> errMsg = 
@@ -59,7 +60,8 @@ public:
         "Cannot use built-in function name as function name",
         "Function re-definition",
         "Wrong argument for the function called",
-        "Arguments doesn't exist in expression"
+        "Arguments doesn't exist in expression",
+        "No argument provided for this function"
     };
 };
 
