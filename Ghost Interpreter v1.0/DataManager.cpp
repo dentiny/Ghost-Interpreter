@@ -235,10 +235,13 @@ void DataManager::assignVar(const std::string & var_name, const std::string & va
 }
 
 // declare function
-void DataManager::declareFunc(const std::string & func_name, std::vector<std::string> & argList, std::vector<std::string> & expression)
+void DataManager::declareFunc(const std::string & func_name, 
+        std::vector<std::string> & argList, 
+        std::vector<std::string> & expression,
+        std::vector<std::vector<std::string>> & nestedFuncList)
 {
     auto it = scopeArr.rbegin();
-    it->declareFunc(func_name, argList, expression);
+    it->declareFunc(func_name, argList, expression, nestedFuncList);
 }
 
 // declare type and value to variable

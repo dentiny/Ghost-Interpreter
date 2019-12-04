@@ -62,6 +62,9 @@ private:
     // pre-evaluate the return type after building the expression tree
     varType retType;
 
+    // vector version of the expression
+    std::vector<std::string> exprVec;
+
     // parameters of the expression
     std::vector<std::string> argTbl;
 
@@ -120,12 +123,40 @@ public:
         {}
 
     // constructor
-    ExprTree(std::vector<std::string> & _argTbl, std::vector<std::string> & _expression) : 
+    ExprTree(std::vector<std::string> & _argTbl, std::vector<std::string> & _expression, std::vector<std::vector<std::string>> & nestedFuncList) : 
         root{nullptr},
         retType{varType::NULL_VAR},
         argTbl{_argTbl}
     {
-        root = buildTreeHelper(_expression, false);
+        // get nested function's expression vector
+        for(const std::string & expression : _expression)
+        {
+            // 19 is the length of "_expression marker "
+            if(expression.find("_expression marker ") == 0)
+            {
+                // expression: _expression marker 10
+                // get the last part of the string, convert to integer
+                size_t j = expression.find_last_of(' ');
+                int idx = stoi(expression.substr(j + 1));
+
+                // add "(" and ")" to two sides of the expression vector
+                exprVec.push_back("(");
+                exprVec.insert(exprVec.end(), nestedFuncList[idx].begin(), nestedFuncList[idx].end());
+                exprVec.push_back(")");
+            }
+            else
+            {
+                exprVec.push_back(expression);
+            }
+        }
+
+
+        std::for_each(exprVec.begin(), exprVec.end(), [](std::string s) { std::cout << s << " " << std::flush; });
+        std::cout << std::endl;
+
+
+        // built expression tree by the expression vector, and pre-evaluate the return type
+        root = buildTreeHelper(exprVec, false);
         evalRetTypeHelper(root);
     }    
 
@@ -133,6 +164,7 @@ public:
     ExprTree(const ExprTree & rhs) : 
         root{nullptr},
         retType{rhs.retType},
+        exprVec{rhs.exprVec},
         argTbl{rhs.argTbl},
         argMap{rhs.argMap}
     {
@@ -147,6 +179,7 @@ public:
             deleteHelper(root);
             root = copyHelper(rhs.root);
             retType = rhs.retType;
+            exprVec = rhs.exprVec;
             argTbl = rhs.argTbl;
             argMap = rhs.argMap;
         }
@@ -159,6 +192,7 @@ public:
     {
         std::swap(root, rhs.root);
         std::swap(retType, rhs.retType);
+        std::swap(exprVec, rhs.exprVec);
         std::swap(argTbl, rhs.argTbl);
         std::swap(argMap, rhs.argMap);
     }
@@ -170,6 +204,7 @@ public:
         {
             std::swap(root, rhs.root);
             std::swap(retType, rhs.retType);
+            std::swap(exprVec, rhs.exprVec);
             std::swap(argTbl, rhs.argTbl);
             std::swap(argMap, rhs.argMap);
         }
@@ -184,7 +219,7 @@ public:
 
     bool isValidArgument(const std::vector<std::string> & _argTbl) const; // check validility of argument list
     varType getRetType() const; // get pre-evaluated return type
-
+    std::vector<std::string> getExprTree(); // return expression vector of the expression tree
     Ghost_intObj evalInteger(const std::vector<std::string> & argList); // evaluate integer
     Ghost_floatObj evalFloat(const std::vector<std::string> & argList); // evaluate float
     Ghost_stringObj evalString(const std::vector<std::string> & argList); // evaluate string

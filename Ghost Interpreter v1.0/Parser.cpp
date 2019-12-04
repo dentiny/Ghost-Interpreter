@@ -488,17 +488,37 @@ bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
         err_no = NO_ARG;
         return false;
     }
-    std::vector<std::string> argList(cmd_vec.begin() + 3, cmd_vec.begin() + j);
-    std::vector<std::string> expression(cmd_vec.begin() + j + 2, cmd_vec.end());
-    
+    std::vector<std::string> argList(cmd_vec.begin() + 3, cmd_vec.begin() + j); // arguments of the function
+    std::vector<std::string> expression;
+    std::vector<std::vector<std::string>> nestedFuncList;
+    unsigned nestFunc = 0;
+    for(size_t i = j + 2; i < cmd_vec.size(); ++i)
+    {
+        std::string var = cmd_vec[i];
+        if(hasFuncVariable(var))
+        {
+            ExprTree exprTree = getFuncVar(var);
+            std::vector<std::string> exprTreeVec = exprTree.getExprTree();
+            nestedFuncList.push_back(exprTreeVec);
+            expression.push_back("_expression marker " + std::to_string(nestFunc));
+            ++nestFunc;
+            int rightParenthesis = findMatched(cmd_vec, "(", ")", i + 1); // i + 1 is the index of "("
+            i = rightParenthesis;
+        }
+        else
+        {
+            expression.push_back(var);
+        }
+    }
+/*
     // check arguments if exist in expression
     if(!checkArgInExpression(argList, expression))
     {
         err_no = ARG_NOT_EXPR;
         return false;
     }
-
-    declareFunc(func_name, argList, expression);
+*/
+    declareFunc(func_name, argList, expression, nestedFuncList);
     return true;
 }
 

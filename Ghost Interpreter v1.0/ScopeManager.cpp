@@ -286,13 +286,16 @@ void ScopeManager::assignVar(const std::string & var_name, const std::string & v
 }
 
 // declare function
-void ScopeManager::declareFunc(const std::string & func_name, std::vector<std::string> & argList, std::vector<std::string> & expression)
+void ScopeManager::declareFunc(const std::string & func_name, 
+        std::vector<std::string> & argList, 
+        std::vector<std::string> & expression,
+        std::vector<std::vector<std::string>> & nestedFuncList)
 {
     if(hasFuncVariable(func_name))
     {
         std::cout << "Declare function error from ScopeManager" << std::endl;
     }
-    funcTbl[func_name] = ExprTree(argList, expression);
+    funcTbl[func_name] = ExprTree(argList, expression, nestedFuncList);
 }
 
 // declare type and value to variable

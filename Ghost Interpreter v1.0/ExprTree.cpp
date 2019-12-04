@@ -165,6 +165,13 @@ void ExprTree::deleteHelper(ExprTree::Node * r)
     }
 }
 
+// to handle nested function
+// return root of the expression tree
+std::vector<std::string> ExprTree::getExprTree()
+{
+    return exprVec;
+}
+
 // check validility of argument list
 bool ExprTree::isValidArgument(const std::vector<std::string> & _argTbl) const
 {

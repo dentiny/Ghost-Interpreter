@@ -53,7 +53,7 @@ public:
     bool postfixOperation(const std::string & var_name, const std::string & op); // apply postfix operation on variable by its name
     void showLocalVar(); // show local variables
     void showVariable(); // show all variables
-    void declareFunc(const std::string & func_name, std::vector<std::string> & argList, std::vector<std::string> & expression); // declare function
+    void declareFunc(const std::string & func_name, std::vector<std::string> & argList, std::vector<std::string> & expression, std::vector<std::vector<std::string>> & nestedFuncList); // declare function
     void assignVar(const std::string & var_name, const std::string & var_val); // assign type and value to variable
     void declareVar(const std::string & var_name, std::string var_val, varType var_type); // declare type and value to variable
     varType getVariableType(const std::string & var_name); // get variable type
