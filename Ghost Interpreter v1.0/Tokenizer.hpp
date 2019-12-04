@@ -59,13 +59,24 @@ public:
                 // search for the next matched right 
                 int j = findMatched(cmd, '(', ')', i);
 
-                // recursively substring in the cmd string
-                std::string bracketed_cmd = cmd.substr(i + 1, j - i - 1);
-                std::vector<std::string> bracted_ops = tokenize(bracketed_cmd);
-                ops.push_back("(");
-                ops.insert(ops.end(), bracted_ops.begin(), bracted_ops.end());
-                ops.push_back(")");
-                i = j;
+                // no charater between "()"
+                if(j == i + 1)
+                {
+                    ops.push_back("(");
+                    ops.push_back(")");
+                    i = j;
+                }
+
+                else
+                {
+                    // recursively substring in the cmd string
+                    std::string bracketed_cmd = cmd.substr(i + 1, j - i - 1);
+                    std::vector<std::string> bracted_ops = tokenize(bracketed_cmd);
+                    ops.push_back("(");
+                    ops.insert(ops.end(), bracted_ops.begin(), bracted_ops.end());
+                    ops.push_back(")");
+                    i = j;
+                }
             }
 
             // '[' check for Ghost_listObj

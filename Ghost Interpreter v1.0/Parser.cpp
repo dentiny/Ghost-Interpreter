@@ -482,10 +482,15 @@ bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
     }
 
     // tokenize parameter list and built expression tree object
-    int j = findMatched(cmd_vec, "(", ")", 3);
+    int j = findMatched(cmd_vec, "(", ")", 2); // "(" index is 2
+    if(j == 3) // if no argument, j should be 3
+    {
+        err_no = NO_ARG;
+        return false;
+    }
     std::vector<std::string> argList(cmd_vec.begin() + 3, cmd_vec.begin() + j);
     std::vector<std::string> expression(cmd_vec.begin() + j + 2, cmd_vec.end());
-
+    
     // check arguments if exist in expression
     if(!checkArgInExpression(argList, expression))
     {
