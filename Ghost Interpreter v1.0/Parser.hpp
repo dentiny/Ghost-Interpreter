@@ -99,6 +99,9 @@ public:
         // after gathering all instruction(meet a "}") then execute all of them
         if(intoWhileLoop)
         {
+            // state boolean to mark dead while loop
+            bool deadLoop = false;
+
             if(cmd_vec.size() == 1 && cmd_vec[0] == "{")
             {
                 ++frontCurlyBraceCnt;
@@ -123,7 +126,7 @@ public:
                         {
                             // decide dead loop, and leave the while-loop
                             err_no = DEAD_WHILE_LOOP;
-                            std::cout << errMsg[err_no] << std::endl;
+                            deadLoop = true;
                             break; 
                         }
                         ++interationDepth;
@@ -145,7 +148,7 @@ public:
             {
                 whileCmdVec.push_back(cmd_vec);
             }
-            return true;
+            return !deadLoop;
         }
 
         // no valid argument, continue
