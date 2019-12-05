@@ -40,6 +40,9 @@ public:
 
         // delete default ScopeManager when exiting main scope
         deleteScopeManager();
+
+        // close the filestream
+        f.close();
     }
 };
 
