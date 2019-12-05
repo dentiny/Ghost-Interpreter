@@ -456,7 +456,47 @@ bool Parser::quadrupleTokenBuiltin(const std::vector<std::string> & cmd_vec)
     std::string f = cmd_vec[0];
     std::string var_name = cmd_vec[2];
 
-    if(f == "print")
+    if(f == "toupper")
+    {
+        if(hasVariable(var_name))
+        {
+            Ghost_stringObj obj = getStringVar(var_name);
+            obj.toUpper();
+            std::cout << obj << std::endl;
+            return true;
+        }
+        else if(getVarType(var_name) == varType::STRING_VAR)
+        {
+            Ghost_stringObj obj(var_name);
+            obj.toUpper();
+            std::cout << obj << std::endl;
+            return true;
+        }
+
+        err_no = UNDECLARED_OR_NOT_STR;
+        return false;
+    }
+    else if(f == "tolower")
+    {
+        if(hasVariable(var_name))
+        {
+            Ghost_stringObj obj = getStringVar(var_name);
+            obj.toLower();
+            std::cout << obj << std::endl;
+            return true;
+        }
+        else if(getVarType(var_name) == varType::STRING_VAR)
+        {
+            Ghost_stringObj obj(var_name);
+            obj.toLower();
+            std::cout << obj << std::endl;
+            return true;
+        }
+
+        err_no = UNDECLARED_OR_NOT_STR;
+        return false;
+    }
+    else if(f == "print")
     {
         bool printVarHandleSuc = printVarHandle(cmd_vec);   
         return printVarHandleSuc;

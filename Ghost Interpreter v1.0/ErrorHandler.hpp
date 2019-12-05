@@ -39,7 +39,8 @@ public:
         IF_ERR, // if statement error, front curly brace needed
         SCOPE_ERR, // should first enter into a scope
         FUNC_NAME_AS_ARG, // argument cannot be a function
-        DEAD_WHILE_LOOP // exceed maximum while loop depth, suspect dead while loop
+        DEAD_WHILE_LOOP, // exceed maximum while loop depth, suspect dead while loop
+        UNDECLARED_OR_NOT_STR // variable not declared or not string
     };
     
     const std::array<std::string, 50> errMsg = 
@@ -69,7 +70,8 @@ public:
         "If statement error, front curly brace needed",
         "Should first enter into a scope",
         "Argument cannot be a function",
-        "Exceed maximum while loop depth, suspect dead while loop"
+        "Exceed maximum while loop depth, suspect dead while loop",
+        "The variable is not declared or is not string type"
     };
 };
 

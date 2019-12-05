@@ -28,6 +28,8 @@ public:
     // unordered_set to store built-in function
     const std::unordered_set<std::string> built_in_func
     {
+        "toupper", // convert Ghost_stringObj to uppercase
+        "tolower", // convert Ghost_stringObj to lowercase
         "print", // get the value of a constant or a variable
         "val", // get the value of variable
         "type", // get the type of variable
@@ -67,14 +69,6 @@ public:
     Ghost_floatObj evalFloat(std::vector<std::string> & argList, ExprTree & exp); // evaluate float expression
     Ghost_stringObj evalString(std::vector<std::string> & argList, ExprTree & exp); // evaluate string expression
     Ghost_listObj evalList(std::vector<std::string> & argList, ExprTree & exp); // evaluate list expression
-
-
-
-    void getScope()
-    {
-        std::cout << "scope manager has " << scopeArr.size() << std::endl;
-    }
-
 };
 
 #endif
