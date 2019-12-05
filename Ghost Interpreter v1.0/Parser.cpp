@@ -32,6 +32,11 @@ bool Parser::singleScopeHandle(const std::string & op)
             deleteScopeManager();
             return true;
         }
+        else
+        {
+            err_no = SCOPE_ERR;
+            return false;
+        }
     }
     return false;
 }
@@ -741,25 +746,24 @@ bool Parser::ifStatementHandle(const std::vector<std::string> & cmd_vec)
 
     // get "if" decision statement
     std::vector<std::string> statementVec(cmd_vec.begin() + 2, rightParenthesisIt);
-    enterIfStatement = getBooleanValue(statementVec);
+    bool enterIfStatement = getBooleanValue(statementVec);
 
-    // front curly brace can only be at the end of the if statement or at the front of the next line command
-    if(cmd_vec.back() != "{")
-    {
-        ++wait_for_front_curly_brace;
-    }
-
+    // whether "if" statement is met, there should be front curly brace
     if(cmd_vec.back() == "{")
     {
         createScopeManager();
+        ++scopeDepth;
     }
-    
-    // if "if" decision statement is false
-    // wait for rear curly brace and ignore all statements in between 
-    if(!enterIfStatement)
+    else
     {
-        ++wait_for_rear_curly_brace;
+        wait_for_front_curly_brace = true;
     }
+
+    // successful or not of "if" statement decides wait_for_rear_curly brace
+    // if condition is not met, set wait_for_rear_curly_brace to true
+    // which may ignore all statements in between
+    wait_for_rear_curly_brace = !enterIfStatement;
+
     return true;
 }
 

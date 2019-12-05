@@ -37,6 +37,7 @@ public:
         ARG_NOT_EXPR, // argument doesn't exist in expression
         NO_ARG, // No argument provided for this expression
         IF_ERR, // if statement error, front curly brace needed
+        SCOPE_ERR, // should first enter into a scope
     };
     
     const std::array<std::string, 50> errMsg = 
@@ -63,7 +64,8 @@ public:
         "Wrong argument for the function called",
         "Arguments doesn't exist in expression",
         "No argument provided for this function",
-        "If statement error, front curly brace needed"
+        "If statement error, front curly brace needed",
+        "Should first enter into a scope"
     };
 };
 

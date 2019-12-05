@@ -19,9 +19,8 @@ class Parser : virtual public DataManager, public Comparator
 {
 private:
     unsigned scopeDepth = 0;
-    bool enterIfStatement = false; 
-    unsigned wait_for_front_curly_brace = 0; // for if statment, if enter if statement, a curly brace must trail after or appear first next line
-    unsigned wait_for_rear_curly_brace = 0; // if "if" statement is false, don't do anything until rear curly brace appears
+    bool wait_for_front_curly_brace = false; // for if statment, if enter if statement, a curly brace must trail after or appear first next line
+    bool wait_for_rear_curly_brace = false; // if "if" statement is false, don't do anything until rear curly brace appears
     bool checkArgInExpression(const std::vector<std::string> & argList, const std::vector<std::string> & expression); // check whether arguments in expression
     bool singleScopeHandle(const std::string & token); // handle enter and leave scope
     bool singleVarHandle(const std::string & token, bool trailMode); // handle single variable
@@ -48,27 +47,30 @@ private:
 public:
     bool parse(std::vector<std::string> & cmd_vec)
     {
-        // if-statement related decision
-        if(wait_for_front_curly_brace > 0)
+        // wait_for_front_curly_brace state flag
+        // whether "if" statement is met, it both should be met 
+        if(wait_for_front_curly_brace)
         {
             if(cmd_vec.size() == 1 && cmd_vec[0] == "{")
             {
-                createScopeManager(); 
-                --wait_for_front_curly_brace;
+                wait_for_front_curly_brace = false;
+                createScopeManager();
+                ++scopeDepth;
                 return true;
+
             }
             else
             {
                 // reset if statement related flag
-                wait_for_front_curly_brace = 0;
-                wait_for_rear_curly_brace = 0;
+                wait_for_front_curly_brace = false;
+                wait_for_rear_curly_brace = false;
                 err_no = IF_ERR;
                 return false;
             }
         }
 
         // wait for rear curly brace is only set when if decision statement is false
-        if(wait_for_rear_curly_brace > 0)
+        if(wait_for_rear_curly_brace)
         {
             // ignore all statements between if statement and rear curly brace
             if(cmd_vec.size() != 1 || cmd_vec[0] != "}")         
@@ -77,8 +79,9 @@ public:
             }
             else
             {
-                --wait_for_rear_curly_brace;
+                wait_for_rear_curly_brace = false;
                 deleteScopeManager();
+                --scopeDepth;
                 return true;
             }
         }

@@ -67,6 +67,14 @@ public:
     Ghost_floatObj evalFloat(std::vector<std::string> & argList, ExprTree & exp); // evaluate float expression
     Ghost_stringObj evalString(std::vector<std::string> & argList, ExprTree & exp); // evaluate string expression
     Ghost_listObj evalList(std::vector<std::string> & argList, ExprTree & exp); // evaluate list expression
+
+
+
+    void getScope()
+    {
+        std::cout << "scope manager has " << scopeArr.size() << std::endl;
+    }
+
 };
 
 #endif
