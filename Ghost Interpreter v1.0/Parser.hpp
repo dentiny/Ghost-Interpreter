@@ -204,6 +204,13 @@ public:
         }
 
         // expression handle
+        if(err_no != INVALID_INPUT) 
+        {
+            // otherwise the right category has been tried to execute
+            return false;
+        }
+
+        // expression
         bool multipleTokenHandleSuc = multipleTokenHandle(cmd_vec);
         return multipleTokenHandleSuc;
     }
