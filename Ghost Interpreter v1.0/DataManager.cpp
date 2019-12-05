@@ -326,7 +326,14 @@ BasicDataManager::varType DataManager::evalRetType(const std::vector<std::string
         {
             return typeRes;
         }
-        retType = (retType == varType::INT_VAR) ? typeRes : retType;
+        else if(typeRes == varType::FLOAT_VAR || retType == varType::FLOAT_VAR)
+        {
+            retType = varType::FLOAT_VAR;
+        }
+        else
+        {
+            retType = varType::INT_VAR;
+        }
     }
     return retType;
 }

@@ -150,11 +150,11 @@ public:
                 exprVec.push_back(expression);
             }
         }
-
+/*
         // debug information
         std::for_each(exprVec.begin(), exprVec.end(), [](std::string s) { std::cout << s << " " << std::flush; });
         std::cout << std::endl;
-
+*/
         // built expression tree by the expression vector, and pre-evaluate the return type
         root = buildTreeHelper(exprVec, false);
         evalRetTypeHelper(root);

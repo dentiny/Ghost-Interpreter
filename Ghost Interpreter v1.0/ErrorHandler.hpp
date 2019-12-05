@@ -11,7 +11,6 @@ struct ErrorHandler
 public:
     // every time an unexpected error happens,
     // update the err_no, main execute() trace error message by error number
-    unsigned err_no;
     enum err_t
     {
         EXIT_CONFIRM, // exit confirmation
@@ -73,6 +72,10 @@ public:
         "Exceed maximum while loop depth, suspect dead while loop",
         "The variable is not declared or is not string type"
     };
+
+    // err_no have to be initialized at first
+    // otherwise expression handle may depend on uninitialized variable
+    unsigned err_no = INVALID_INPUT;
 };
 
 #endif
