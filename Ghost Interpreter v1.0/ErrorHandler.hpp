@@ -38,7 +38,8 @@ public:
         NO_ARG, // No argument provided for this expression
         IF_ERR, // if statement error, front curly brace needed
         SCOPE_ERR, // should first enter into a scope
-        FUNC_NAME_AS_ARG // argument cannot be a function
+        FUNC_NAME_AS_ARG, // argument cannot be a function
+        DEAD_WHILE_LOOP // exceed maximum while loop depth, suspect dead while loop
     };
     
     const std::array<std::string, 50> errMsg = 
@@ -67,7 +68,8 @@ public:
         "No argument provided for this function",
         "If statement error, front curly brace needed",
         "Should first enter into a scope",
-        "Argument cannot be a function"
+        "Argument cannot be a function",
+        "Exceed maximum while loop depth, suspect dead while loop"
     };
 };
 

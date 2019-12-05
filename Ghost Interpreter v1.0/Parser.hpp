@@ -11,6 +11,7 @@
 #include <cctype>
 #include <string>
 #include <vector>
+#include <limits>
 #include <iostream>
 #include <unordered_set>
 #include <unordered_map>
@@ -19,6 +20,7 @@ class Parser : virtual public DataManager, public Comparator
 {
 private:
     unsigned scopeDepth = 0;
+    unsigned long interationDepth = 0; // while-loop iteration depth
     bool intoWhileLoop = false;
     unsigned frontCurlyBraceCnt = 0;
     std::vector<std::string> whileCond;
@@ -115,13 +117,26 @@ public:
                     intoWhileLoop = false;
                     while(getBooleanValue(whileCond))
                     {
+                        // check whether dead loop using a shreshold
+                        // if so, end the loop and clear the state flag
+                        if(interationDepth >= std::numeric_limits<unsigned long>::max() - 1)
+                        {
+                            // decide dead loop, and leave the while-loop
+                            err_no = DEAD_WHILE_LOOP;
+                            std::cout << errMsg[err_no] << std::endl;
+                            break; 
+                        }
+                        ++interationDepth;
+
+                        // execute the instruction in while-loop
                         for(std::vector<std::string> instruction : whileCmdVec)
                         {
                             parse(instruction);
-                        } 
+                        }
                     }
 
                     // reset while-related variable
+                    interationDepth = 0;
                     whileCmdVec.clear();
                     whileCond.clear();
                 }
