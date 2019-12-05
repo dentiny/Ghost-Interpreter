@@ -28,6 +28,8 @@ public:
     Ghost_stringObj & operator*=(long long num); // operator *= overload with integer
     Ghost_stringObj operator*(Ghost_intObj & rhs) const; // operator * overload
     Ghost_stringObj & operator*=(Ghost_intObj & rhs); // operator *= overload
+    Ghost_stringObj operator*(Ghost_stringObj & rhs) const; // operator * overload with Ghost_stringObj
+    Ghost_stringObj & operator*=(Ghost_stringObj & rhs); // operator *= overload with Ghost_stringObj
     bool operator<(std::string s) const; // less than with constant
     bool operator<=(std::string s) const; // less or equal with constant
     bool operator>(std::string s) const; // larger than with constant

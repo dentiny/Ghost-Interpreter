@@ -11,6 +11,7 @@
 #include <iostream>
 #include <algorithm>
 #include <unordered_set>
+#include <unordered_map>
 
 // helper function for singleTokenHandle()
 // enter into and leave from scope
@@ -497,13 +498,40 @@ bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
         std::string var = cmd_vec[i];
         if(hasFuncVariable(var))
         {
+            // find the match parenthesis, and for get formal arguments
+            int rightParenthesis = findMatched(cmd_vec, "(", ")", i + 1); // i + 1 is the index of "("
+            
+           // formal argument for nested function
+            std::vector<std::string> nestedFuncArg(cmd_vec.begin() + i + 2, cmd_vec.begin() + rightParenthesis); // f(x, y) => x, y
+            i = rightParenthesis;
+
+            // get expression tree for nested function, and replace to current arguments
             ExprTree exprTree = getFuncVar(var);
-            std::vector<std::string> exprTreeVec = exprTree.getExprTree();
+            BasicDataManager::ExprPair exprTreePair = exprTree.getExprTree(); // first for arguments, second for expression
+            std::vector<std::string> originalFuncArgList = exprTreePair.first; // f(a, b) = a + b
+            std::vector<std::string> exprTreeVec = exprTreePair.second; // ( a + b )
+
+            // build a mapping relation for replacement
+            std::unordered_map<std::string, std::string> oriToCur;
+            for(size_t i = 0; i < originalFuncArgList.size(); ++i)
+            {
+                oriToCur[originalFuncArgList[i]] = nestedFuncArg[i];
+            }
+
+            // replacement
+            for(size_t i = 0; i < exprTreeVec.size(); ++i)
+            {
+                std::string token = exprTreeVec[i];
+                if(oriToCur.find(token) != oriToCur.end())
+                {
+                    exprTreeVec[i] = oriToCur[token];
+                }
+            }
+
+            // append replaced expression
             nestedFuncList.push_back(exprTreeVec);
             expression.push_back("_expression marker " + std::to_string(nestFunc));
             ++nestFunc;
-            int rightParenthesis = findMatched(cmd_vec, "(", ")", i + 1); // i + 1 is the index of "("
-            i = rightParenthesis;
         }
         else
         {

@@ -96,13 +96,14 @@ private:
     // Ghost_stringObj
     std::unordered_map<std::string, std::function<Ghost_stringObj(Ghost_stringObj, Ghost_stringObj)>> stringOps
     {
-        {"+", [](Ghost_stringObj obj1, Ghost_stringObj obj2) { return obj1 + obj2; }}
+        {"+", [](Ghost_stringObj obj1, Ghost_stringObj obj2) { return obj1 + obj2; }},
+        {"*", [](Ghost_stringObj obj1, Ghost_stringObj obj2) { return obj1 * obj2; }}
     };
 
     // Ghost_listObj
     std::unordered_map<std::string, std::function<Ghost_listObj(Ghost_listObj, Ghost_listObj)>> listOps
     {
-        {"+", [](Ghost_listObj obj1, Ghost_listObj obj2) { return obj1 + obj2; }}
+        {"+", [](Ghost_listObj obj1, Ghost_listObj obj2) { return obj1 + obj2; }},
     };
 
     Node * buildTreeHelper(std::vector<std::string> & expression, bool inBrace); // character-wise parse expression
@@ -150,10 +151,9 @@ public:
             }
         }
 
-
+        // debug information
         std::for_each(exprVec.begin(), exprVec.end(), [](std::string s) { std::cout << s << " " << std::flush; });
         std::cout << std::endl;
-
 
         // built expression tree by the expression vector, and pre-evaluate the return type
         root = buildTreeHelper(exprVec, false);
@@ -219,7 +219,7 @@ public:
 
     bool isValidArgument(const std::vector<std::string> & _argTbl) const; // check validility of argument list
     varType getRetType() const; // get pre-evaluated return type
-    std::vector<std::string> getExprTree(); // return expression vector of the expression tree
+    BasicDataManager::ExprPair getExprTree(); // return expression vector of the expression tree
     Ghost_intObj evalInteger(const std::vector<std::string> & argList); // evaluate integer
     Ghost_floatObj evalFloat(const std::vector<std::string> & argList); // evaluate float
     Ghost_stringObj evalString(const std::vector<std::string> & argList); // evaluate string

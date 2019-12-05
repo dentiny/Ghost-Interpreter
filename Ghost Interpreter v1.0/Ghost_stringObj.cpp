@@ -93,6 +93,20 @@ Ghost_stringObj & Ghost_stringObj::operator*=(Ghost_intObj & rhs)
     return *this;
 }
 
+// operator * overload with Ghost_stringObj
+Ghost_stringObj Ghost_stringObj::operator*(Ghost_stringObj & rhs) const
+{
+    Ghost_intObj obj(rhs.val);
+    return *this * obj;
+}
+
+// operator *= overload with Ghost_stringObj
+Ghost_stringObj & Ghost_stringObj::operator*=(Ghost_stringObj & rhs)
+{
+    *this = *this * rhs;
+    return *this;
+}
+
 // less than with constant
 bool Ghost_stringObj::operator<(std::string s) const
 {

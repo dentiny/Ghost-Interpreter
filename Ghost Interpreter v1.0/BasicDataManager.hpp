@@ -12,6 +12,11 @@
 struct BasicDataManager : virtual public ErrorHandler
 {
 public:
+    // using alias for return Expression Tree
+    // first element is argument list
+    // second element is expression vector
+    using ExprPair = std::pair<std::vector<std::string>, std::vector<std::string>>;
+
     // enum class to define variable type
     enum class varType 
     { 

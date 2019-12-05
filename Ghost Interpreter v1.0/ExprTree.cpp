@@ -167,9 +167,9 @@ void ExprTree::deleteHelper(ExprTree::Node * r)
 
 // to handle nested function
 // return root of the expression tree
-std::vector<std::string> ExprTree::getExprTree()
+BasicDataManager::ExprPair ExprTree::getExprTree()
 {
-    return exprVec;
+    return std::make_pair(argTbl, exprVec);
 }
 
 // check validility of argument list
