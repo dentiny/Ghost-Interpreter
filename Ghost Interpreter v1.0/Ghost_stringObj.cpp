@@ -6,6 +6,12 @@
 #include <stdexcept>
 #include <algorithm>
 
+// parametric constructor
+Ghost_stringObj::Ghost_stringObj(std::string _val) : val{_val}
+{
+    val = (val[0] == '"' && val.back() == '"') ? val.substr(1, val.length() - 2) : val;
+}
+
 // move constructor
 Ghost_stringObj::Ghost_stringObj(Ghost_stringObj && rhs)
 {
@@ -36,7 +42,7 @@ Ghost_stringObj & Ghost_stringObj::operator=(Ghost_stringObj && rhs)
 Ghost_stringObj Ghost_stringObj::operator+(std::string rhs) const
 {
     // "aaa""bbb" => "aaabbb"
-    std::string catRes = val.substr(0, val.length() - 1) + rhs.substr(1, rhs.length() - 1);
+    std::string catRes = val + rhs.substr(1, rhs.length() - 2);
     return Ghost_stringObj(catRes);
 }
 
@@ -50,7 +56,7 @@ Ghost_stringObj & Ghost_stringObj::operator+=(std::string rhs)
 // Ghost_stringObj::operator + overload
 Ghost_stringObj Ghost_stringObj::operator+(Ghost_stringObj & rhs) const
 {
-    std::string catRes = val.substr(0, val.length() - 1) + rhs.val.substr(1, rhs.val.length() - 1);
+    std::string catRes = val + rhs.val;
     return Ghost_stringObj(catRes);
 }
 
@@ -110,37 +116,37 @@ Ghost_stringObj & Ghost_stringObj::operator*=(Ghost_stringObj & rhs)
 // less than with constant
 bool Ghost_stringObj::operator<(std::string s) const
 {
-    return val < s;
+    return val < s.substr(1, s.length() - 2);
 } 
 
 // less or equal with constant
 bool Ghost_stringObj::operator<=(std::string s) const
 {
-    return val <= s;
+    return val <= s.substr(1, s.length() - 2);
 }
 
 // larger than with constant
 bool Ghost_stringObj::operator>(std::string s) const
 {
-    return val > s;
+    return val > s.substr(1, s.length() - 2);
 }
 
 // larger or equal with constant
 bool Ghost_stringObj::operator>=(std::string s) const
 {
-    return val >= s;
+    return val >= s.substr(1, s.length() - 2);
 }
 
 // equal with constant
 bool Ghost_stringObj::operator==(std::string s) const
 {
-    return val == s;
+    return val == s.substr(1, s.length() - 2);
 }
 
 // not equal with constant
 bool Ghost_stringObj::operator!=(std::string s) const
 {
-    return val != s;
+    return val != s.substr(1, s.length() - 2);
 }
 
 // less than

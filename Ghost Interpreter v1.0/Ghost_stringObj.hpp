@@ -15,7 +15,7 @@ private:
     
 public:
     Ghost_stringObj() : val{""} {} // constructor
-    Ghost_stringObj(std::string _val) : val{_val} {} // parametric constructor
+    Ghost_stringObj(std::string _val); // parametric constructor
     Ghost_stringObj(const Ghost_stringObj & rhs) : val{rhs.val} {} // copy constructor
     Ghost_stringObj(Ghost_stringObj && rhs); // move constructor
     Ghost_stringObj & operator=(const Ghost_stringObj & rhs); // copy assignment

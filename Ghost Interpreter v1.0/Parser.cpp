@@ -276,8 +276,9 @@ bool Parser::doubleConcatOperation(const std::vector<std::string> & cmd_vec)
 
     if(getVarType(op1) == varType::STRING_VAR && getVarType(op2) == varType::STRING_VAR)
     {
-        std::string catRes = op1.substr(0, op1.size() - 1) + op2.substr(1, op2.size() - 1);
-        std::cout << catRes << std::endl;
+        Ghost_stringObj obj1(op1);
+        Ghost_stringObj obj2(op2);
+        std::cout << (obj1 + obj2) << std::endl;
         return true;
     }
     return false;
