@@ -17,6 +17,13 @@
 // enter into and leave from scope
 bool Parser::singleScopeHandle(const std::string & op)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     if(op == "{")
     {
         ++scopeDepth;
@@ -41,19 +48,30 @@ bool Parser::singleScopeHandle(const std::string & op)
     return false;
 }
 
+// single variable, constant and function output method has been added a boolean argument -- trailMode
+// this argument is for the compatibility with built-in function -- printVarHandle()
+// for single string input, trailMode should be set false, which may generate a newliner after every var output
+// for continuous printint method, trailMode will be set on, thus space will act as splitter between strings
 // helper function for singleTokenHandle()
 // variable value check: x => 20
 bool Parser::singleVarHandle(const std::string & var_name, bool trailMode)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     if(hasVariable(var_name))
     {
         std::string val = getVariable(var_name);
         std::cout << val << std::flush;
-        if(trailMode)
+        if(trailMode) // built-in print() mode 
         {
             std::cout << " " << std::flush;
         }
-        else 
+        else // single constant/variable mode
         {
             std::cout << std::endl;
         }
@@ -66,6 +84,13 @@ bool Parser::singleVarHandle(const std::string & var_name, bool trailMode)
 // constant value check: x => 20
 bool Parser::singleConstHandle(const std::string & var_name, bool trailMode)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     varType typeRes = getVarType(var_name);
     if(typeRes == varType::NULL_VAR)
     {
@@ -131,14 +156,17 @@ bool Parser::singleConstHandle(const std::string & var_name, bool trailMode)
     return false;
 }
 
-// single variable, constant and function output method has been added a boolean argument -- trailMode
-// this argument is for the compatibility with built-in function -- printVarHandle()
-// for single string input, trailMode should be set false, which may generate a newliner after every var output
-// for continuous printint method, trailMode will be set on, thus space will act as splitter between strings
 // helper function for singleTokenHandle()
 // single function check: <function f at location>
 bool Parser::singleFuncHandle(const std::string & func_name, bool trailMode)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     if(hasBuiltinFuncVar(func_name) || hasFuncVariable(func_name))
     {
         std::cout << "<Function object>" << std::flush;
@@ -161,6 +189,7 @@ bool Parser::singleFuncHandle(const std::string & func_name, bool trailMode)
 // (3) single function check: <function f at location> => singleFuncHandle()
 bool Parser::singleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
+    err_no = INVALID_INPUT; // default error message
     std::string token = cmd_vec[0];
     if(singleScopeHandle(token) || singleVarHandle(token, false) || singleConstHandle(token, false) || singleFuncHandle(token, false))
     {
@@ -174,6 +203,13 @@ bool Parser::singleTokenHandle(const std::vector<std::string> & cmd_vec)
 // self-operation: ++x
 bool Parser::doubleSelfOperation(const std::vector<std::string> & cmd_vec)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     std::string op1 = cmd_vec[0];
     std::string op2 = cmd_vec[1];
 
@@ -228,6 +264,13 @@ bool Parser::doubleSelfOperation(const std::vector<std::string> & cmd_vec)
 // string concatenation: "aaa""bbb" => "aaabbb"
 bool Parser::doubleConcatOperation(const std::vector<std::string> & cmd_vec)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     std::string op1 = cmd_vec[0];
     std::string op2 = cmd_vec[1];
 
@@ -257,9 +300,15 @@ bool Parser::doubleTokenHandle(const std::vector<std::string> & cmd_vec)
 // built-in function with no argument
 bool Parser::tripleTokenBuiltin(const std::vector<std::string> & cmd_vec)
 {
-    std::string f = cmd_vec[0];
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
 
-    // argument is not a built-in function
+    // argument is a built-in function
+    std::string f = cmd_vec[0];
     if(built_in_func.find(f) != built_in_func.end())
     {
         if(f == "show_local")
@@ -272,7 +321,6 @@ bool Parser::tripleTokenBuiltin(const std::vector<std::string> & cmd_vec)
         }
         return true;
     }
-    err_no = INVALID_INPUT;
     return false;
 }
 
@@ -280,6 +328,13 @@ bool Parser::tripleTokenBuiltin(const std::vector<std::string> & cmd_vec)
 // update variable value
 bool Parser::tripleTokenUpdateVar(const std::vector<std::string> & cmd_vec)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     // get corresponding parts of the expression
     std::string var_name = cmd_vec[0];
     std::string eq_sgn = cmd_vec[1];
@@ -329,6 +384,13 @@ bool Parser::tripleTokenHandle(const std::vector<std::string> & cmd_vec)
 // handle quadruple token for variable declaration
 bool Parser::quadrupleVarDeclare(const std::vector<std::string> & cmd_vec)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     // decide whether variable declaration
     if(cmd_vec[0] != "var" || cmd_vec[2] != "=")
     {
@@ -384,6 +446,13 @@ bool Parser::quadrupleVarDeclare(const std::vector<std::string> & cmd_vec)
 // handle quadruple token for built-in function with parameter
 bool Parser::quadrupleTokenBuiltin(const std::vector<std::string> & cmd_vec)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     std::string f = cmd_vec[0];
     std::string var_name = cmd_vec[2];
 
@@ -457,8 +526,30 @@ bool Parser::checkArgInExpression(const std::vector<std::string> & argList, cons
     return true;
 }
 
+// helper function for functionDefHandle()
+// check whether arguments is already a function variable -- high order function
+// return true if valid, else return false
+bool Parser::checkArgEqualFunction(const std::vector<std::string> & argList, const std::string & func_name)
+{
+    for(const std::string & arg : argList)
+    {
+        if(arg == func_name || hasFuncVariable(arg))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     // function declaration statement begins with def
     if(cmd_vec[0] != "def")
     {
@@ -490,7 +581,26 @@ bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
         err_no = NO_ARG;
         return false;
     }
-    std::vector<std::string> argList(cmd_vec.begin() + 3, cmd_vec.begin() + j); // arguments of the function
+
+    // check argument validility
+    std::vector<std::string> argList(cmd_vec.begin() + 3, cmd_vec.begin() + j);
+    std::vector<std::string> rawExpression(cmd_vec.begin() + j + 2, cmd_vec.end());
+
+    // check arguments if exist in expression
+    if(!checkArgInExpression(argList, rawExpression))
+    {
+        err_no = ARG_NOT_EXPR;
+        return false;
+    }
+
+    // check arguments if equals to function name
+    if(!checkArgEqualFunction(argList, func_name))
+    {
+        err_no = FUNC_NAME_AS_ARG;
+        return false;
+    }
+
+    // build expression tree based on expression
     std::vector<std::string> expression;
     std::vector<std::vector<std::string>> nestedFuncList;
     unsigned nestFunc = 0;
@@ -531,7 +641,7 @@ bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
 
             // append replaced expression
             nestedFuncList.push_back(exprTreeVec);
-            expression.push_back("_expression marker " + std::to_string(nestFunc));
+            expression.push_back("_expression marker " + std::to_string(nestFunc)); // use "_expression marker NO" as a marker to replace
             ++nestFunc;
         }
         else
@@ -539,14 +649,7 @@ bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
             expression.push_back(var);
         }
     }
-/*
-    // check arguments if exist in expression
-    if(!checkArgInExpression(argList, expression))
-    {
-        err_no = ARG_NOT_EXPR;
-        return false;
-    }
-*/
+
     declareFunc(func_name, argList, expression, nestedFuncList);
     return true;
 }
@@ -554,6 +657,13 @@ bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
 // handle variadic print, supports multiple variables and constants
 bool Parser::printVarHandle(const std::vector<std::string> & cmd_vec)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     // print() statement begins with "print"
     if(cmd_vec[0] != "print")
     {
@@ -590,6 +700,13 @@ bool Parser::printVarHandle(const std::vector<std::string> & cmd_vec)
 // handle function execution
 bool Parser::functionExecuteHandle(const std::vector<std::string> & cmd_vec)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     // check whether function call
     if(!hasFuncVariable(cmd_vec[0]) || cmd_vec[1] != "(" || cmd_vec.back() != ")")
     {
@@ -649,6 +766,7 @@ bool Parser::functionExecuteHandle(const std::vector<std::string> & cmd_vec)
     return false;
 }
 
+// helper function for ifStatementHandle() and whileStatementHandle()
 // get boolean value of "if" statement evaluation
 bool Parser::getBooleanValue(const std::vector<std::string> & ifStatement)
 {
@@ -733,6 +851,13 @@ bool Parser::getBooleanValue(const std::vector<std::string> & ifStatement)
 // handle if statement
 bool Parser::ifStatementHandle(const std::vector<std::string> & cmd_vec)
 {
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
     // check whether if statement
     if(cmd_vec[0] != "if" || cmd_vec[1] != "(")
     {
@@ -767,11 +892,61 @@ bool Parser::ifStatementHandle(const std::vector<std::string> & cmd_vec)
     return true;
 }
 
+// handle if statement
+bool Parser::whileStatementHandle(const std::vector<std::string> & cmd_vec)
+{
+    // only set error number when 100% ensured
+    // then if error number has been set, no reason to execute other categories
+    if(err_no != INVALID_INPUT)
+    {
+        return false;
+    }
+
+    // check whether while statement
+    if(cmd_vec[0] != "while" || cmd_vec[1] != "(")
+    {
+        return false;
+    }
+    auto rightParenthesisIt = find(cmd_vec.begin(), cmd_vec.end(), ")");
+    if(rightParenthesisIt == cmd_vec.end())
+    {
+        return false;
+    }
+
+    // get "while" decision statement
+    std::vector<std::string> statementVec(cmd_vec.begin() + 2, rightParenthesisIt);
+    bool enterWhileStatement = getBooleanValue(statementVec);
+
+    // whether "if" statement is met, there should be front curly brace
+    if(cmd_vec.back() == "{")
+    {
+        createScopeManager();
+        ++scopeDepth;
+    }
+    else
+    {
+        wait_for_front_curly_brace = true;
+    }
+
+    // successful or not of "if" statement decides wait_for_rear_curly brace
+    // if condition is not met, set wait_for_rear_curly_brace to true
+    // which may ignore all statements in between
+    wait_for_rear_curly_brace = !enterWhileStatement;
+    intoWhileLoop = enterWhileStatement;
+
+    if(enterWhileStatement)
+    {
+        whileCond = statementVec;
+    }
+
+    return true;
+}
+
 // handle multiple tokens
 bool Parser::multipleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
     err_no = INVALID_INPUT;
-    if(functionDefHandle(cmd_vec) || printVarHandle(cmd_vec) || functionExecuteHandle(cmd_vec) || ifStatementHandle(cmd_vec))
+    if(functionDefHandle(cmd_vec) || printVarHandle(cmd_vec) || functionExecuteHandle(cmd_vec) || ifStatementHandle(cmd_vec) || whileStatementHandle(cmd_vec))
     {
         return true;
     }

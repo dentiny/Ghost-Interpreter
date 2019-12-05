@@ -19,8 +19,13 @@ class Parser : virtual public DataManager, public Comparator
 {
 private:
     unsigned scopeDepth = 0;
+    bool intoWhileLoop = false;
+    unsigned frontCurlyBraceCnt = 0;
+    std::vector<std::string> whileCond;
+    std::vector<std::vector<std::string>> whileCmdVec;
     bool wait_for_front_curly_brace = false; // for if statment, if enter if statement, a curly brace must trail after or appear first next line
     bool wait_for_rear_curly_brace = false; // if "if" statement is false, don't do anything until rear curly brace appears
+    bool checkArgEqualFunction(const std::vector<std::string> & argList, const std::string & func_name); // check whether formal argument is already a function
     bool checkArgInExpression(const std::vector<std::string> & argList, const std::vector<std::string> & expression); // check whether arguments in expression
     bool singleScopeHandle(const std::string & token); // handle enter and leave scope
     bool singleVarHandle(const std::string & token, bool trailMode); // handle single variable
@@ -42,6 +47,7 @@ private:
     bool functionExecuteHandle(const std::vector<std::string> & cmd_vec); // handle function execution
     bool getBooleanValue(const std::vector<std::string> & ifStatement); // get boolean value of "if" decision statement
     bool ifStatementHandle(const std::vector<std::string> & cmd_vec); // handle if statement
+    bool whileStatementHandle(const std::vector<std::string> & cmd_vec); // handle while statement
     bool multipleTokenHandle(const std::vector<std::string> & cmd_vec); // handle multiple tokens
 
 public:
@@ -64,6 +70,7 @@ public:
                 // reset if statement related flag
                 wait_for_front_curly_brace = false;
                 wait_for_rear_curly_brace = false;
+                intoWhileLoop = false;
                 err_no = IF_ERR;
                 return false;
             }
@@ -84,6 +91,46 @@ public:
                 --scopeDepth;
                 return true;
             }
+        }
+
+        // during while loop, push all instructions into a vector
+        // after gathering all instruction(meet a "}") then execute all of them
+        if(intoWhileLoop)
+        {
+            if(cmd_vec.size() == 1 && cmd_vec[0] == "{")
+            {
+                ++frontCurlyBraceCnt;
+                whileCmdVec.push_back(cmd_vec);
+            }
+            else if(cmd_vec.size() == 1 && cmd_vec[0] == "}")
+            {
+                if(frontCurlyBraceCnt > 0)
+                {
+                    --frontCurlyBraceCnt;
+                    whileCmdVec.push_back(cmd_vec);
+                }
+                else
+                {
+                    // execute instructions inside while statement block
+                    intoWhileLoop = false;
+                    while(getBooleanValue(whileCond))
+                    {
+                        for(std::vector<std::string> instruction : whileCmdVec)
+                        {
+                            parse(instruction);
+                        } 
+                    }
+
+                    // reset while-related variable
+                    whileCmdVec.clear();
+                    whileCond.clear();
+                }
+            }
+            else
+            {
+                whileCmdVec.push_back(cmd_vec);
+            }
+            return true;
         }
 
         // no valid argument, continue
