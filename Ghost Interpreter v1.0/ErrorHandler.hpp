@@ -35,7 +35,8 @@ public:
         FUNC_REDEF, // function re-definition
         ARG_FAULT, // wrong argument for the function called
         ARG_NOT_EXPR, // argument doesn't exist in expression
-        NO_ARG // No argument provided for this expression
+        NO_ARG, // No argument provided for this expression
+        IF_ERR, // if statement error, front curly brace needed
     };
     
     const std::array<std::string, 50> errMsg = 
@@ -61,7 +62,8 @@ public:
         "Function re-definition",
         "Wrong argument for the function called",
         "Arguments doesn't exist in expression",
-        "No argument provided for this function"
+        "No argument provided for this function",
+        "If statement error, front curly brace needed"
     };
 };
 

@@ -303,11 +303,7 @@ bool Parser::tripleTokenUpdateVar(const std::vector<std::string> & cmd_vec)
 bool Parser::tripleTokenCompareVar(const std::vector<std::string> & cmd_vec)
 {
     bool cmpRes = compare(cmd_vec);
-    if(cmpRes)
-    {
-        return true;
-    }
-    return false;
+    return cmpRes;
 }
 
 // handle three token command
@@ -648,11 +644,130 @@ bool Parser::functionExecuteHandle(const std::vector<std::string> & cmd_vec)
     return false;
 }
 
+// get boolean value of "if" statement evaluation
+bool Parser::getBooleanValue(const std::vector<std::string> & ifStatement)
+{
+    // single var, constant value or variable
+    if(ifStatement.size() == 1)
+    {
+        std::string var = ifStatement[0];
+
+        // variable
+        if(hasVariable(var))
+        {
+            varType typeRes = getVariableType(var);
+            if(typeRes == varType::INT_VAR)
+            {
+                Ghost_intObj obj = getIntVar(var);
+                return bool(obj);
+            }
+            else if(typeRes == varType::FLOAT_VAR)
+            {
+                Ghost_floatObj obj = getFloatVar(var);
+                return bool(obj);
+            }
+            else if(typeRes == varType::STRING_VAR)
+            {
+                Ghost_stringObj obj = getStringVar(var);
+                return bool(obj);
+            }
+            else if(typeRes == varType::LIST_VAR)
+            {
+                Ghost_listObj obj = getListVar(var);
+                return bool(obj);
+            }
+            else
+            {
+                std::cout << "Get boolean error from DataManager" << std::endl;
+            }
+        }
+        // constant value
+        else
+        {
+            varType typeRes = getVarType(var);
+            if(typeRes == varType::INT_VAR)
+            {
+                Ghost_intObj obj(var);
+                return bool(obj);
+            }
+            else if(typeRes == varType::FLOAT_VAR)
+            {
+                Ghost_floatObj obj(var);
+                return bool(obj);
+            }
+            else if(typeRes == varType::STRING_VAR)
+            {
+                Ghost_stringObj obj(var);
+                return bool(obj);
+            }
+            else if(typeRes == varType::LIST_VAR)
+            {
+                Ghost_listObj obj(var);
+                return bool(obj);
+            }
+            else
+            {
+                std::cout << "Get boolean error from DataManager" << std::endl;
+            }
+        }
+    }
+
+    // three var, comparison statement
+    else if(ifStatement.size() == 3)
+    {
+        std::string op = ifStatement[1];
+        std::string val1 = ifStatement[0];
+        std::string val2 = ifStatement[2];
+        bool cmpRes = compare(op, val1, val2);
+        return cmpRes;
+    }
+
+    return false; // "if" decision statement cannot be other argument numbers
+}
+
+// handle if statement
+bool Parser::ifStatementHandle(const std::vector<std::string> & cmd_vec)
+{
+    // check whether if statement
+    if(cmd_vec[0] != "if" || cmd_vec[1] != "(")
+    {
+        return false;
+    }
+    auto rightParenthesisIt = find(cmd_vec.begin(), cmd_vec.end(), ")");
+    if(rightParenthesisIt == cmd_vec.end())
+    {
+        return false;
+    }
+
+    // get "if" decision statement
+    std::vector<std::string> statementVec(cmd_vec.begin() + 2, rightParenthesisIt);
+    enterIfStatement = getBooleanValue(statementVec);
+
+    // front curly brace can only be at the end of the if statement or at the front of the next line command
+    if(cmd_vec.back() != "{")
+    {
+        ++wait_for_front_curly_brace;
+    }
+
+    if(cmd_vec.back() == "{")
+    {
+        createScopeManager();
+    }
+    
+    // if "if" decision statement is false
+    // wait for rear curly brace and ignore all statements in between 
+    if(!enterIfStatement)
+    {
+        ++wait_for_rear_curly_brace;
+    }
+    return true;
+}
+
 // handle multiple tokens
 bool Parser::multipleTokenHandle(const std::vector<std::string> & cmd_vec)
 {
     err_no = INVALID_INPUT;
-    if(functionDefHandle(cmd_vec) || printVarHandle(cmd_vec) || functionExecuteHandle(cmd_vec))
+    if(functionDefHandle(cmd_vec) || printVarHandle(cmd_vec) || functionExecuteHandle(cmd_vec) || ifStatementHandle(cmd_vec))
     {
         return true;
     }

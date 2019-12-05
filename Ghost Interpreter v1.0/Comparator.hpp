@@ -31,40 +31,13 @@ private:
     }
 
 public:
-    bool compare(const std::vector<std::string> & cmd_vec)
+    // comparison between two vars
+    // return type is the result of the comparison
+    bool compare(const std::string & op, const std::string & val1, const std::string & val2)
     {
-        std::string op = cmd_vec[1];
-        std::string val1 = cmd_vec[0];
-        std::string val2 = cmd_vec[2];
-
-        // invalid operator
-        if(ops.find(op) == ops.end())
-        {
-            return false;
-        }
-
-        // get the variable type of two arguments and decide whether comparable
-        varType typeRes1 = varType::NULL_VAR;
-        typeRes1 = getVariableType(val1);
-        if(typeRes1 == varType::NULL_VAR)
-        {
-            typeRes1 = getVarType(val1);
-        }
-        varType typeRes2 = varType::NULL_VAR;
-        typeRes2 = getVariableType(val2);
-        if(typeRes2 == varType::NULL_VAR)
-        {
-            typeRes2 = getVarType(val2);
-        }
-
-        // decide if comparable
-        if(!comparable(typeRes1, typeRes2))
-        {
-            err_no = UNCOMPARABLE;
-            return false;
-        }
-
         bool cmpRes = false;
+        varType typeRes1 = getVariableType(val1);
+        varType typeRes2 = getVariableType(val2);
 
         // (1) string comparison
         // 1 string to string
@@ -104,9 +77,6 @@ public:
                 Ghost_stringObj obj2 = Ghost_stringObj(val2);
                 cmpRes = obj1.compare(op, obj2);
             }
-
-            std::cout << (cmpRes ? "true" : "false") << std::endl;
-            return true;
         }
 
         // (2) list object
@@ -147,9 +117,6 @@ public:
                 Ghost_listObj obj2 = Ghost_listObj(val2);
                 cmpRes = obj1.compare(op, obj2);
             }
-
-            std::cout << (cmpRes ? "true" : "false") << std::endl;
-            return true;
         }
 
         // (3) integer object
@@ -190,9 +157,6 @@ public:
                 Ghost_intObj obj2 = Ghost_intObj(val2);
                 cmpRes = obj1.compare(op, obj2);
             }
-
-            std::cout << (cmpRes ? "true" : "false") << std::endl;
-            return true;
         }
 
         // (4) float object
@@ -233,9 +197,6 @@ public:
                 Ghost_floatObj obj2 = Ghost_floatObj(val2);
                 cmpRes = obj1.compare(op, obj2);
             }
-
-            std::cout << (cmpRes ? "true" : "false") << std::endl;
-            return true;
         }
 
         // (5) cross comparison
@@ -344,12 +305,50 @@ public:
                     std::cout << "Cross comparison condition 1 & 5 error" << std::endl;
                 }
             }
-
-            std::cout << (cmpRes ? "true" : "false") << std::endl;
-            return true;
         }
 
-        return false;
+        // cmpRes is the result of comparison
+        return cmpRes;
+    }
+
+    // return value is the status of the comparison function
+    // comparison result will be displayed directly
+    bool compare(const std::vector<std::string> & cmd_vec)
+    {
+        std::string op = cmd_vec[1];
+        std::string val1 = cmd_vec[0];
+        std::string val2 = cmd_vec[2];
+
+        // invalid operator
+        if(ops.find(op) == ops.end())
+        {
+            return false;
+        }
+
+        // get the variable type of two arguments and decide whether comparable
+        varType typeRes1 = varType::NULL_VAR;
+        typeRes1 = getVariableType(val1);
+        if(typeRes1 == varType::NULL_VAR)
+        {
+            typeRes1 = getVarType(val1);
+        }
+        varType typeRes2 = varType::NULL_VAR;
+        typeRes2 = getVariableType(val2);
+        if(typeRes2 == varType::NULL_VAR)
+        {
+            typeRes2 = getVarType(val2);
+        }
+
+        // decide if comparable
+        if(!comparable(typeRes1, typeRes2))
+        {
+            err_no = UNCOMPARABLE;
+            return false;
+        }
+
+        bool cmpRes = compare(op, val1, val2);
+        std::cout << (cmpRes ? "true" : "false") << std::endl;
+        return true;
     }
 };
 

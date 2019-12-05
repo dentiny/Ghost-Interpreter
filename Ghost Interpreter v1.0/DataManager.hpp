@@ -21,7 +21,8 @@ public:
     const std::unordered_set<std::string> keywords
     {
         "var", // declaration of variable
-        "def" // declaration of function
+        "def", // declaration of function
+        "if" // declaration of if statement
     };
 
     // unordered_set to store built-in function
