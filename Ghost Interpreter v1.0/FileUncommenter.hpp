@@ -5,6 +5,10 @@
 #include <string>
 #include <iostream>
 
+// FileGhost inherits FileUncommenter, for these two modes need different modes of uncomment
+// for command ghost, it only cares about line comment style -- //
+// for file ghost, it considers line comment(//) and block comment(/*)
+
 class FileUncommenter
 {
 private:
