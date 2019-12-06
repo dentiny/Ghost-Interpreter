@@ -5,14 +5,12 @@
 
 class Uncommenter
 {
-private:
-    bool in_block = false;
-
 public:
     // like C and C++, Ghost Language use // and /* */ as comment block
     void uncomment(std::string & cmd)
     {
         // uncomment the statement
+        bool in_block = false; // whether in comment block
         std::string buffer; // buffer as uncommented statement
         int N = cmd.length();
         for(int i = 0; i < N; ++i)

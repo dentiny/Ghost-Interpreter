@@ -3,15 +3,16 @@
 #ifndef FILE_GHOST_HPP__
 #define FILE_GHOST_HPP__
 
-#include "FileUncommenter.hpp"
+#include "Uncommenter.hpp"
 #include "Tokenizer.hpp"
 #include "Parser.hpp"
 #include <string>
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
-class FileGhost : public FileUncommenter, public Tokenizer, public Parser
+class FileGhost : public Uncommenter, public Tokenizer, public Parser
 {
 public:
     void execute(const std::string & filename)
@@ -24,19 +25,12 @@ public:
             return;
         }
 
-        // uncomment the code
-        std::string line;
-        std::vector<std::string> rawCode;
-        while(std::getline(f, line))
-        {
-            rawCode.push_back(line);
-        }
-        std::vector<std::string> uncommentedCode = uncomment(rawCode);
-
         // create a scope when entering main scope
         createScopeManager();
-        for(std::string cmd : uncommentedCode)
+        std::string cmd;
+        while(std::getline(f, cmd))
         {
+            uncomment(cmd);
             std::vector<std::string> cmd_vec = tokenize(cmd);
             bool ifValid = parse(cmd_vec);
             if(!ifValid)
@@ -47,10 +41,7 @@ public:
 
         // delete default ScopeManager when exiting main scope
         deleteScopeManager();
-
-        // close the filestream
-        f.close();
     }
 };
 
-#endif
+#endif 
