@@ -234,6 +234,12 @@ void Ghost_listObj::append(Ghost_stringObj & obj)
     val.push_back(temp);
 }
 
+// get the size of the vector
+size_t Ghost_listObj::getSize() const
+{
+    return val.size();
+}
+
 // get value
 std::vector<Ghost_listObj::T> Ghost_listObj::getVal() const
 {

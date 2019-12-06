@@ -39,7 +39,8 @@ public:
         SCOPE_ERR, // should first enter into a scope
         FUNC_NAME_AS_ARG, // argument cannot be a function
         DEAD_WHILE_LOOP, // exceed maximum while loop depth, suspect dead while loop
-        UNDECLARED_OR_NOT_STR // variable not declared or not string
+        UNDECLARED_OR_NOT_STR, // variable not declared or not string
+        UNLENGTHABLE // variable or constant value cannot get a length
     };
     
     const std::array<std::string, 50> errMsg = 
@@ -70,7 +71,8 @@ public:
         "Should first enter into a scope",
         "Argument cannot be a function",
         "Exceed maximum while loop depth, suspect dead while loop",
-        "The variable is not declared or is not string type"
+        "The variable is not declared or is not string type",
+        "Variable or constant value cannot get a length"
     };
 
     // err_no have to be initialized at first

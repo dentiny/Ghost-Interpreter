@@ -459,7 +459,7 @@ bool Parser::quadrupleTokenBuiltin(const std::vector<std::string> & cmd_vec)
 
     if(f == "toupper")
     {
-        if(hasVariable(var_name))
+        if(hasVariable(var_name) && getVariableType(var_name) == varType::STRING_VAR)
         {
             Ghost_stringObj obj = getStringVar(var_name);
             obj.toUpper();
@@ -479,7 +479,7 @@ bool Parser::quadrupleTokenBuiltin(const std::vector<std::string> & cmd_vec)
     }
     else if(f == "tolower")
     {
-        if(hasVariable(var_name))
+        if(hasVariable(var_name) && getVariableType(var_name) == varType::STRING_VAR)
         {
             Ghost_stringObj obj = getStringVar(var_name);
             obj.toLower();
@@ -495,6 +495,43 @@ bool Parser::quadrupleTokenBuiltin(const std::vector<std::string> & cmd_vec)
         }
 
         err_no = UNDECLARED_OR_NOT_STR;
+        return false;
+    }
+    else if(f == "len")
+    {
+        if(hasVariable(var_name))
+        {
+            if(getVariableType(var_name) == varType::STRING_VAR)
+            {
+                Ghost_stringObj obj = getStringVar(var_name);
+                size_t len = obj.getSize();
+                std::cout << len << std::endl;
+                return true;
+            }
+            else if(getVariableType(var_name) == varType::LIST_VAR)
+            {
+                Ghost_listObj obj = getListVar(var_name);
+                size_t len = obj.getSize();
+                std::cout << len << std::endl;
+                return true;
+            }
+        }
+        else if(getVarType(var_name) == varType::STRING_VAR)
+        {
+            Ghost_stringObj obj(var_name);
+            size_t len = obj.getSize();
+            std::cout << len << std::endl;
+            return true;
+        }
+        else if(getVarType(var_name) == varType::LIST_VAR)
+        {
+            Ghost_listObj obj(var_name);
+            size_t len = obj.getSize();
+            std::cout << len << std::endl;
+            return true;
+        }
+
+        err_no = UNLENGTHABLE;
         return false;
     }
     else if(f == "print")
@@ -690,7 +727,7 @@ bool Parser::functionDefHandle(const std::vector<std::string> & cmd_vec)
             expression.push_back(var);
         }
     }
-    
+
     declareFunc(func_name, argList, expression, nestedFuncList);
     return true;
 }

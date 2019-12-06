@@ -22,12 +22,14 @@ public:
     {
         "var", // declaration of variable
         "def", // declaration of function
-        "if" // declaration of if statement
+        "if", // declaration of if statement
+        "while" // declaration of while statement
     };
 
     // unordered_set to store built-in function
     const std::unordered_set<std::string> built_in_func
     {
+        "len", // get the length of Ghost_stringObj or Ghost_listObj
         "toupper", // convert Ghost_stringObj to uppercase
         "tolower", // convert Ghost_stringObj to lowercase
         "print", // get the value of a constant or a variable

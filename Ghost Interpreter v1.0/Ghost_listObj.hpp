@@ -65,6 +65,7 @@ public:
     void append(Ghost_floatObj & obj); // append a float into the list
     void append(Ghost_stringObj & obj); // append a string into the list
     std::string getVal_s() const; // get value in string
+    size_t getSize() const; // get the size of the list
     std::string getType() const; // get type
     operator bool() const; // bool() overload
     // friend ostream
