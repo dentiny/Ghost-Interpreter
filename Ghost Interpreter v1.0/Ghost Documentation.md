@@ -1,3 +1,4 @@
+
 # Ghost Programming Language
 
 ## Preface
@@ -61,6 +62,21 @@ intVar = [1, 2, 3] // intVar is internally changed to Ghost_listObj
 ```
 Built-in function type(), val() and query() are supported to check the status of existant variables at any time.
 
+## Function declaration and execution
+- Ghost use ```var``` as the keyword to declare a function.
+```
+def f1(a,b) = a * b - 2 / y
+```
+ It also supports one function defined upon another.
+
+```
+def f2(x,y)= x * y - x;
+def f(a,b,c,d)= f1(a, b) - f2(c, d)
+
+// execution
+f(1, 2, 3, 4) // may return -6
+```
+ 
 ## Error handle and error message
 Error message has been implanted to give fundamental but important hint on user input or file content, which I expect may easily to erase mis-typing.
 ```
@@ -141,6 +157,19 @@ while(val < boolean) {
 
 
 ## Detailed grammer
+- Once you input a single variable(including functor), its value will appear on the screen.
+
+For functors, things are slightly different; it may appear as ```<Function object>```.
+
+```
+var val1=10
+def f(a) = a
+
+val1 => 10
+f => <Function object>
+[1, 2, 3] => [1, 2, 3]
+```
+
 - Semicolon is accecptable but not required
 ```
 var var1 = 10; // acceptable
