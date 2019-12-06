@@ -60,7 +60,7 @@ public:
     void showVariable(); // show all variables
     void declareFunc(const std::string & func_name, std::vector<std::string> & argList, std::vector<std::string> & expression, std::vector<std::vector<std::string>> & nestedFuncList); // declare function
     void assignVar(const std::string & var_name, const std::string & var_val); // assign type and value to variable
-    void declareVar(const std::string & var_name, std::string var_val, varType var_type); // declare type and value to variable
+    void declareVar(const std::string & var_name, const std::string & var_val, varType var_type); // declare type and value to variable
     varType getVariableType(const std::string & var_name); // get variable type
     std::string getType(const std::string & var_name); // get variable type by its name in string version
     std::string getVal(const std::string & var_name); // get variable value by its name in string version

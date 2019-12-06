@@ -223,11 +223,15 @@ void DataManager::showVariable()
 // assign type and value to variable
 void DataManager::assignVar(const std::string & var_name, const std::string & var_val)
 {
+    // var_val can be variable or constant value
+    // if variable to be assigned, get its'value, else constant value
+    std::string valueToAssigned = hasVariable(var_val) ? getVal(var_val) : var_val;
+
     for(auto it = scopeArr.rbegin(); it != scopeArr.rend(); ++it)
     {
         if(it->hasVariable(var_name))
         {
-            it->assignVar(var_name, var_val);
+            it->assignVar(var_name, valueToAssigned);
             return;
         }
     }
@@ -245,10 +249,15 @@ void DataManager::declareFunc(const std::string & func_name,
 }
 
 // declare type and value to variable
-void DataManager::declareVar(const std::string & var_name, std::string var_val, varType var_type)
+void DataManager::declareVar(const std::string & var_name, const std::string & var, varType var_type)
 {
+    // var_val can be variable or constant value
+    // if variable to be assigned, get its'value, else constant value
+    std::string valueToAssigned = hasVariable(var) ? getVal(var) : var;
+
+    // declare variable in the current scope
     auto it = scopeArr.rbegin();
-    it->declareVar(var_name, var_val, var_type);
+    it->declareVar(var_name, valueToAssigned, var_type);
 }
 
 // get variable type

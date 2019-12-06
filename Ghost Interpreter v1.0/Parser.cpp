@@ -404,7 +404,7 @@ bool Parser::quadrupleVarDeclare(const std::vector<std::string> & cmd_vec)
     // if not, add variable to the table
     std::string var_name = cmd_vec[1];
     std::string var_val = cmd_vec[3];
-    varType typeRes = getVarType(var_val);
+    varType typeRes = getVariableType(var_val);
 
     // check validility of variable name
     if(keywords.find(var_name) != keywords.end())
